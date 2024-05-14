@@ -1,0 +1,20 @@
+{{>partial_header}}
+package {{packageName}}
+
+{{#operations}}
+import (
+	"bytes"
+	"context"
+	"io"
+	"net/http"
+	"net/url"
+{{#imports}}	"{{import}}"
+{{/imports}}
+)
+
+//  {{classname}} is a simple wrapper around the client for {{classname}} 
+type {{classname}} interface {
+	{{#operation}}
+
+{{/operation}}
+{{/operations}}

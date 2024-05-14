@@ -15,6 +15,7 @@
         devDeps = with pkgs;
           buildDeps ++ [
             easyjson
+            openapi-generator-cli
             goreleaser
           ];
       in

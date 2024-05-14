@@ -7,6 +7,23 @@ BUILD_DATE ?= $(shell date "$(DATE_FMT)") # "-u" for UTC time (zero offset)
 BUILD_DIR ?= bin
 LDFLAGS += "-X main.version=$(VERSION) -X main.commitHash=$(COMMIT_HASH) -X main.buildDate=$(BUILD_DATE)"
 
+OPENAPI_SPEC_PATH           ?= api/v2.openapi.json
+GENERATE_CONFIG_PATH        ?= generate/config.yaml
+GENERATE_TEMPLATES_PATH     ?= generate/templates
+OUTPUT_PATH                 ?= output
+
+# To pass extra options to openapi-generator-cli, set this:
+OPENAPI_GENERATOR_EXTRA_OPTIONS ?= --global-property debugOpenAPI=true,debugModels=true,apis,apiTests=false,apiDocs=false,generateAliasAsModel=false
+
+OPENAPI_GENERATOR_OPTIONS += --generator-name go
+OPENAPI_GENERATOR_OPTIONS += --engine mustache
+OPENAPI_GENERATOR_OPTIONS += --input-spec $(OPENAPI_SPEC_PATH)
+OPENAPI_GENERATOR_OPTIONS += --config $(GENERATE_CONFIG_PATH)
+OPENAPI_GENERATOR_OPTIONS += --template-dir $(GENERATE_TEMPLATES_PATH)
+OPENAPI_GENERATOR_OPTIONS += --output $(OUTPUT_PATH)
+
+OPENAPI_GENERATOR_ENV += GO_POST_PROCESS_FILE="$(shell which gofmt) -w"
+
 .DEFAULT_GOAL: help
 default: help
 
@@ -24,6 +41,10 @@ install:  ## Install binaries.
 
 gen: ## Generates code and documentation (see: ./gen.go).
 	go generate ./...
+
+regen:
+	rm -rf $(OUTPUT_PATH)
+	$(OPENAPI_GENERATOR_ENV) openapi-generator-cli generate $(OPENAPI_GENERATOR_OPTIONS) $(OPENAPI_GENERATOR_EXTRA_OPTIONS)
 
 ##@ Test and Lint
 

@@ -1,0 +1,3 @@
+additionalProperties:
+  packageName: omlox
+  packageVersion: 0.0.1
