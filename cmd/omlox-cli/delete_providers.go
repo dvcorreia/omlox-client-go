@@ -74,7 +74,7 @@ func newDeleteProvidersCmd(settings cli.EnvSettings, out io.Writer) *cobra.Comma
 
 // Provide dynamic auto-completion for trackable names.
 func compListProviders(toComplete string, ignoredProviderNames []string, settings cli.EnvSettings) ([]string, cobra.ShellCompDirective) {
-	c, err := omlox.New(settings.OmloxHubAPI)
+	c, err := omlox.NewClient(settings.OmloxHubAPI)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveDefault
 	}

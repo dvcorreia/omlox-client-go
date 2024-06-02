@@ -52,7 +52,7 @@ func newSubCmd(settings cli.EnvSettings, out io.Writer) *cobra.Command {
 				return err
 			}
 
-			if err := c.Connect(ctx); err != nil {
+			if err := c.Connect(); err != nil {
 				return err
 			}
 

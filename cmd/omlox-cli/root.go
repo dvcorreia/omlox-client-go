@@ -63,10 +63,10 @@ func newRootCmd(out io.Writer, args []string) (*cobra.Command, error) {
 
 // newOmloxClient sets up a new Omlox client with given settings.
 func newOmloxClient(settings *cli.EnvSettings) (*omlox.Client, error) {
-	opts := make([]omlox.ClientOption, 0)
+	opts := make([]omlox.ClientOpt, 0)
 
 	if settings.Debug {
-		httpClient := omlox.DefaultConfiguration().HTTPClient
+		httpClient := omlox.DefaultHttpClient()
 
 		httpClient.Transport = &log.SlogerRoundTripper{
 			Logger: slog.Default(),
@@ -76,7 +76,7 @@ func newOmloxClient(settings *cli.EnvSettings) (*omlox.Client, error) {
 		opts = append(opts, omlox.WithHTTPClient(httpClient))
 	}
 
-	return omlox.New(settings.OmloxHubAPI, opts...)
+	return omlox.NewClient(settings.OmloxHubAPI, opts...)
 }
 
 func setupLogger() {

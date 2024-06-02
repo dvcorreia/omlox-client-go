@@ -21,6 +21,36 @@ type Subcription struct {
 	mch chan *WrapperObject
 }
 
+type SubcriptionOpt func(*Subcription) error
+
+func WithSubcriptionParams(params ...Parameter) SubcriptionOpt {
+	return func(s *Subcription) error {
+		s.params = make(Parameters)
+		for _, param := range params {
+			if err := param(s.topic, s.params); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
+func NewSubscription(topic Topic, opts ...SubcriptionOpt) (*Subcription, error) {
+	sub := Subcription{
+		topic: topic,
+	}
+
+	for _, opt := range opts {
+		if opt != nil {
+			if err := opt(&sub); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return &sub, nil
+}
+
 func ReceiveAs[T any](sub *Subcription) <-chan *T {
 	out := make(chan *T, receiveChanSize)
 

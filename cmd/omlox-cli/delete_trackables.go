@@ -70,7 +70,7 @@ func newDeleteTrackablesCmd(settings cli.EnvSettings, out io.Writer) *cobra.Comm
 
 // Provide dynamic auto-completion for trackable names.
 func compListTrackables(toComplete string, ignoredTrackabeNames []string, settings cli.EnvSettings) ([]string, cobra.ShellCompDirective) {
-	c, err := omlox.New(settings.OmloxHubAPI)
+	c, err := omlox.NewClient(settings.OmloxHubAPI)
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveDefault
 	}

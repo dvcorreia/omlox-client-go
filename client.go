@@ -12,81 +12,124 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
+	"time"
 
+	"github.com/hashicorp/go-cleanhttp"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/time/rate"
 	"nhooyr.io/websocket"
 )
 
-// Client manages communication with Omlox™ Hub client.
+// Defaults
+const (
+	DefaultRequestTimeout = 60 * time.Second
+	DefaultConnectTimeout = 60 * time.Second
+)
+
+// DefaultHttpClient uses cleanhttp, which has the same default values as net/http client, but
+// does not share state with other clients (see: gh/hashicorp/go-cleanhttp)
+func DefaultHttpClient() *http.Client {
+	return cleanhttp.DefaultPooledClient()
+}
+
+// ClientOpt is a configuration option to initialize a client.
+type ClientOpt func(*Client) error
+
+// WithHTTPClient sets the HTTP client to use for all API requests.
+func WithHTTPClient(client *http.Client) ClientOpt {
+	return func(c *Client) error {
+		c.client = client
+		return nil
+	}
+}
+
+// WithRequestTimeout, given a non-negative value, will apply the timeout to
+// each request function unless an earlier deadline is passed to the request
+// function through context.Context.
+func WithRequestTimeout(timeout time.Duration) ClientOpt {
+	return func(c *Client) error {
+		if timeout < 0 {
+			return fmt.Errorf("request timeout must not be negative")
+		}
+		c.timeout = timeout
+		return nil
+	}
+}
+
+// WithConnectTimeout, given a non-negative value, will apply the timeout when
+// connecting to the websocket interface.
+func WithConnectTimeout(timeout time.Duration) ClientOpt {
+	return func(c *Client) error {
+		if timeout < 0 {
+			return fmt.Errorf("request timeout must not be negative")
+		}
+		c.connectTimeout = timeout
+		return nil
+	}
+}
+
+// WithRateLimiter configures how frequently requests are allowed to happen.
+// If this pointer is nil, then there will be no limit set. Note that an
+// empty struct rate.Limiter is equivalent to blocking all requests.
+func WithRateLimiter(limiter *rate.Limiter) ClientOpt {
+	return func(c *Client) error {
+		c.rateLimiter = limiter
+		return nil
+	}
+}
+
+// pendingSubscription awaiting for subscription ID from the server
+type pendingSubscription struct {
+	Sid int
+	Err error
+}
+
+// Client represents a client connection to a Omlox Hub.
 type Client struct {
 	mu sync.RWMutex
 
-	// the configuration object is immutable after the client has been initialized
-	configuration ClientConfiguration
+	baseURL *url.URL
 
-	baseAddress *url.URL
-
-	client *http.Client
+	client      *http.Client
+	timeout     time.Duration // request timeout (includes websocket requests)
+	rateLimiter *rate.Limiter
 
 	Trackables TrackablesAPI
 	Providers  ProvidersAPI
-
-	// websockets client fields
 
 	errg   *errgroup.Group
 	cancel context.CancelFunc
 
 	// websockets connection
-	conn   *websocket.Conn
-	closed bool
+	conn           *websocket.Conn
+	connectTimeout time.Duration
+	closed         bool
 
 	// subscriptions
 	subs map[int]*Subcription
 
-	// pending subscription awaiting for subscription ID from the server
-	// can only be one subscription per client awaiting for subscription.
-	pending chan chan struct {
-		sid int
-		err error
-	}
+	// chanel to receive pending subcriptions ack
+	// can only be one subscription per client awaiting for subscription
+	// this is a design constraint from having to wait for a subscription ID
+	pending chan chan pendingSubscription
 }
 
-// New returns a new client decorated with the given configuration options
-func New(addr string, options ...ClientOption) (*Client, error) {
-	configuration := DefaultConfiguration()
-
-	for _, opt := range options {
-		if opt != nil {
-			if err := opt(&configuration); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return newClient(addr, configuration)
-}
-
-// newClient returns a new Omlox™ Hub client with a copy of the given configuration
-func newClient(addr string, configuration ClientConfiguration) (*Client, error) {
-	address, err := url.Parse(addr)
+// NewClient returns a new Client configured by the given options.
+func NewClient(baseURL string, opts ...ClientOpt) (*Client, error) {
+	hubURL, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, err
 	}
 
 	c := Client{
-		configuration: configuration,
+		baseURL: hubURL,
+		timeout: DefaultRequestTimeout,
 
-		// configured or default HTTP client
-		client: configuration.HTTPClient,
+		connectTimeout: DefaultConnectTimeout,
+		closed:         true,
 
-		baseAddress: address,
-
-		closed: true,
-		pending: make(chan chan struct {
-			sid int
-			err error
-		}, 1),
-		subs: make(map[int]*Subcription),
+		pending: make(chan chan pendingSubscription, 1),
+		subs:    make(map[int]*Subcription),
 	}
 
 	c.Trackables = TrackablesAPI{
@@ -95,6 +138,18 @@ func newClient(addr string, configuration ClientConfiguration) (*Client, error) 
 
 	c.Providers = ProvidersAPI{
 		client: &c,
+	}
+
+	for _, opt := range opts {
+		if opt != nil {
+			if err := opt(&c); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if c.client == nil {
+		c.client = DefaultHttpClient()
 	}
 
 	return &c, nil
@@ -138,9 +193,9 @@ func sendRequestParseResponse[ResponseT any](
 	headers http.Header,
 ) (*ResponseT, error) {
 	// apply the client-level request timeout, if set
-	if client.configuration.RequestTimeout > 0 {
+	if client.timeout > 0 {
 		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, client.configuration.RequestTimeout)
+		ctx, cancel = context.WithTimeout(ctx, client.timeout)
 		defer cancel()
 	}
 
@@ -175,9 +230,9 @@ func sendRequestParseResponseList[ResponseT any](
 	headers http.Header,
 ) ([]ResponseT, error) {
 	// apply the client-level request timeout, if set
-	if client.configuration.RequestTimeout > 0 {
+	if client.timeout > 0 {
 		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, client.configuration.RequestTimeout)
+		ctx, cancel = context.WithTimeout(ctx, client.timeout)
 		defer cancel()
 	}
 
@@ -211,7 +266,7 @@ func (c *Client) newRequest(
 	headers http.Header,
 ) (*http.Request, error) {
 	// concatenate the base address with the given path
-	url := c.baseAddress.JoinPath(path)
+	url := c.baseURL.JoinPath(path)
 
 	// add query parameters (if any)
 	if len(parameters) != 0 {
@@ -234,8 +289,8 @@ func (c *Client) newRequest(
 // send sends the given request to Omlox.
 func (c *Client) send(ctx context.Context, req *http.Request) (*http.Response, error) {
 	// block on the rate limiter, if set
-	if c.configuration.RateLimiter != nil {
-		c.configuration.RateLimiter.Wait(ctx)
+	if c.rateLimiter != nil {
+		c.rateLimiter.Wait(ctx)
 	}
 
 	return c.client.Do(req)

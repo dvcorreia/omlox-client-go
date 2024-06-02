@@ -44,33 +44,22 @@ var (
 	ErrTimeout          = errors.New("timeout")
 )
 
-// wrapperObject is an internal abstraction of the websockets data exchange object.
-type wrapperObject struct {
-	// Embedded error fields. Will only be present on error: `event` is error.
-	WebsocketError
-
-	// Wrapper object of websockets data exchanged between client and server
-	WrapperObject
-}
-
-var _ slog.LogValuer = (*wrapperObject)(nil)
-
-// Connect will attempt to connect to the Omlox™ Hub websockets interface.
-func Connect(ctx context.Context, addr string, options ...ClientOption) (*Client, error) {
-	c, err := New(addr, options...)
+// Connect is an helper function which creates a Client and calls Connect.
+func Connect(baseURL string, opts ...ClientOpt) (*Client, error) {
+	c, err := NewClient(baseURL, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := c.Connect(ctx); err != nil {
+	if err := c.Connect(); err != nil {
 		return nil, err
 	}
 
 	return c, nil
 }
 
-// Connect dials the Omlox™ Hub websockets interface.
-func (c *Client) Connect(ctx context.Context) error {
+// Connect will attempt to connect to the Omlox Hub websockets interface.
+func (c *Client) Connect() error {
 	if !c.isClosed() {
 		// close the connection if it happens to be open
 		if err := c.Close(); err != nil {
@@ -78,20 +67,27 @@ func (c *Client) Connect(ctx context.Context) error {
 		}
 	}
 
-	wsURL := c.baseAddress.JoinPath("/ws/socket")
+	wsURL := c.baseURL.JoinPath("/ws/socket")
 
 	if err := upgradeToWebsocketScheme(wsURL); err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
-	errg, ctx := errgroup.WithContext(ctx)
+	ctx := context.Background()
+
+	// apply the connect timeout, if set
+	if c.connectTimeout > 0 {
+		ctx, c.cancel = context.WithTimeout(ctx, c.connectTimeout)
+	}
+
+	var errg *errgroup.Group
+	errg, ctx = errgroup.WithContext(ctx)
 
 	conn, _, err := websocket.Dial(ctx, wsURL.String(), &websocket.DialOptions{
 		HTTPClient: c.client,
 	})
 	if err != nil {
-		cancel()
+		c.cancel()
 		return err
 	}
 
@@ -108,7 +104,6 @@ func (c *Client) Connect(ctx context.Context) error {
 	c.conn = conn
 	c.closed = false
 	c.errg = errg
-	c.cancel = cancel
 	c.mu.Unlock()
 
 	c.errg.Go(func() error {
@@ -169,10 +164,7 @@ func (c *Client) Subscribe(ctx context.Context, topic Topic, params ...Parameter
 // Since each subscription on a topic can have a distinct parameters, we must synchronisly wait to match each one to its ID.
 func (c *Client) subscribe(ctx context.Context, topic Topic, params Parameters) (*Subcription, error) {
 	// channel to await subscription confirmation
-	await := make(chan struct {
-		sid int
-		err error
-	})
+	await := make(chan pendingSubscription)
 	defer close(await)
 
 	select {
@@ -196,18 +188,15 @@ func (c *Client) subscribe(ctx context.Context, topic Topic, params Parameters) 
 	}
 
 	// wait for subcription ID
-	var r struct {
-		sid int
-		err error
-	}
+	var r pendingSubscription
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	case r = <-await:
 	}
 
-	if r.err != nil {
-		return nil, r.err
+	if r.Err != nil {
+		return nil, r.Err
 	}
 
 	sub := &Subcription{
@@ -330,11 +319,8 @@ func (c *Client) handleMessage(ctx context.Context, msg *wrapperObject) {
 	case EventSubscribed:
 		// pop pending subscription and assign subscription ID
 		pendingc := <-c.pending
-		chsend(ctx, pendingc, struct {
-			sid int
-			err error
-		}{
-			sid: msg.SubscriptionID,
+		chsend(ctx, pendingc, pendingSubscription{
+			Sid: msg.SubscriptionID,
 		})
 		return
 	case EventUnsubscribed:
@@ -350,11 +336,8 @@ func (c *Client) handleError(ctx context.Context, msg *wrapperObject) {
 	case ErrCodeSubscription, ErrCodeNotAuthorized, ErrCodeUnknownTopic, ErrCodeInvalid:
 		// pop pending subscription and kill it
 		pendingc := <-c.pending
-		chsend(ctx, pendingc, struct {
-			sid int
-			err error
-		}{
-			err: msg.WebsocketError,
+		chsend(ctx, pendingc, pendingSubscription{
+			Err: msg.WebsocketError,
 		})
 		return
 	case ErrCodeUnknown: // TODO @dvcorreia: handle error
@@ -401,11 +384,8 @@ func (c *Client) clearSubs() {
 	// close any pending subscription
 	select {
 	case pending := <-c.pending:
-		pending <- struct {
-			sid int
-			err error
-		}{
-			err: net.ErrClosed,
+		pending <- pendingSubscription{
+			Err: net.ErrClosed,
 		}
 	default:
 	}
@@ -448,6 +428,14 @@ func upgradeToWebsocketScheme(u *url.URL) error {
 
 	return nil
 }
+
+// wrapperObject is an internal abstraction of the websockets data exchange object.
+type wrapperObject struct {
+	WebsocketError
+	WrapperObject
+}
+
+var _ slog.LogValuer = (*wrapperObject)(nil)
 
 // LogValue implements slog.LogValuer.
 func (w wrapperObject) LogValue() slog.Value {

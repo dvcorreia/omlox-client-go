@@ -11,7 +11,7 @@ import (
 )
 
 func ExampleNew() {
-	c, err := omlox.New("localhost:8081/v2")
+	c, err := omlox.NewClient("localhost:8081/v2")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func ExampleConnect() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client, err := omlox.Connect(ctx, "localhost:7081/v2")
+	client, err := omlox.Connect("localhost:7081/v2")
 	if err != nil {
 		log.Fatal(err)
 	}
