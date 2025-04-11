@@ -3,43 +3,55 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-      ...
-    }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        overlay = import ./nix/pkgs;
+    { self, nixpkgs, ... }:
+    let
+      supportedSystems = [
+        "aarch64-linux"
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+      ];
 
-        pkgs = import nixpkgs {
+      # Helper function to generate an attrset '{ x86_64-linux = f "x86_64-linux"; ... }'.
+      forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
+
+      # Nixpkgs instantiated for supported system types.
+      nixpkgsFor = forAllSystems (
+        system:
+        import nixpkgs {
           inherit system;
-          overlays = [ overlay ];
-        };
+          overlays = [ self.overlay ];
+        }
+      );
+    in
+    {
+      overlay = import ./overlay.nix;
 
-        buildDeps = with pkgs; [
-          git
-          go_1_21
-          gnumake
-        ];
+      formatter = forAllSystems (system: (nixpkgsFor.${system}).nixfmt-rfc-style);
 
-        devDeps =
-          with pkgs;
-          buildDeps
-          ++ [
-            easyjson
-            goreleaser
-            copywrite
-          ];
-      in
-      {
-        devShell = pkgs.mkShell { buildInputs = devDeps; };
-      }
-    );
+      packages = forAllSystems (system: {
+        default = (nixpkgsFor.${system}).omlox-client-go;
+        omlox-client-go = (nixpkgsFor.${system}).omlox-client-go;
+        omlox-client-go-nightly = (nixpkgsFor.${system}).omlox-client-go-nightly;
+      });
+
+      devShells = forAllSystems (
+        system: with nixpkgsFor.${system}; {
+          default = mkShell {
+            inputsFrom = [ omlox-client-go-nightly ];
+            packages = [
+              git
+              gnumake
+
+              easyjson
+              goreleaser
+              copywrite
+            ];
+          };
+        }
+      );
+    };
 }

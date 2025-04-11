@@ -3,6 +3,9 @@ build/
 bin/
 .env
 
+# Nix
+result
+
 # Direnv
 /.direnv/
 
