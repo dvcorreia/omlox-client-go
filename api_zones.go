@@ -132,7 +132,7 @@ func (z *Zones) DeleteZoneById(ctx context.Context, zoneId string) (error) {
 
 // GetAllZoneObjects get an array of all zones.
 // Returns an array of all zone objects.
-func (z *Zones) GetAllZoneObjects(ctx context.Context) (*[]Zone, error) {
+func (z *Zones) GetAllZoneObjects(ctx context.Context) ([]Zone, error) {
 	requestPath := "/v1/zones/summary"
 
 
@@ -185,7 +185,7 @@ func (z *Zones) GetZoneById(ctx context.Context, zoneId string) (*Zone, error) {
 
 // GetZoneIds get an array of all zone ids.
 // This function returns an array of ids of all available zones.
-func (z *Zones) GetZoneIds(ctx context.Context, foreignId string) (*[]string, error) {
+func (z *Zones) GetZoneIds(ctx context.Context, foreignId string) ([]string, error) {
 	requestPath := "/v1/zones"
 
 

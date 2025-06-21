@@ -19,7 +19,7 @@ type {{cut classname "Api"}} struct {
 // Deprecated{{/if}}
 // {{operationId}}{{#if summary}} {{lower (substring summary 0 1)}}{{substring summary 1}}{{/if}}{{#if notes}}
 // {{{notes}}}{{/if}}
-func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}(ctx context.Context{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}, {{paramName}} {{{dataType}}}{{/endsWith}}{{/each}}{{#each bodyParams}}, {{paramName}} {{{dataType}}}{{/each}}{{#each queryParams}}{{#neq paramName "list"}}, {{paramName}} {{{dataType}}}{{/neq}}{{/each}}) ({{#with returnType}}{{#if isListContainer}}{{{.}}}{{else}}*{{{.}}}{{/if}}, {{/with}}error) {
+func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}(ctx context.Context{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}, {{paramName}} {{{dataType}}}{{/endsWith}}{{/each}}{{#each bodyParams}}, {{paramName}} {{{dataType}}}{{/each}}{{#each queryParams}}{{#neq paramName "list"}}, {{paramName}} {{{dataType}}}{{/neq}}{{/each}}) ({{#with returnType}}{{#if returnContainer}}[]{{else}}*{{/if}}{{returnBaseType}}, {{/with}}error) {
 	requestPath := "/v1{{{path}}}"{{#each pathParams}}{{#endsWith baseName "_mount_path"}}
 	requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape(requestModifiers.mountPathOr({{#with defaultValue}}{{{.}}}{{/with}})), -1){{/endsWith}}{{/each}}{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}
 	requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape({{paramName}}), -1){{/endsWith}}{{/each}}

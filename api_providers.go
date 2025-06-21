@@ -162,7 +162,7 @@ func (p *Providers) DeleteProviders(ctx context.Context) (error) {
 
 // GetAllLocations get all locations.
 // Returns the last known location for all location providers.
-func (p *Providers) GetAllLocations(ctx context.Context, crs string, zoneId string, geojson string) (*[]Location, error) {
+func (p *Providers) GetAllLocations(ctx context.Context, crs string, zoneId string, geojson string) ([]Location, error) {
 	requestPath := "/v1/providers/locations"
 
 
@@ -193,7 +193,7 @@ func (p *Providers) GetAllLocations(ctx context.Context, crs string, zoneId stri
 
 // GetAllProviderObjects get an array of all location providers.
 // Returns an array of all location provider objects.
-func (p *Providers) GetAllProviderObjects(ctx context.Context) (*[]LocationProvider, error) {
+func (p *Providers) GetAllProviderObjects(ctx context.Context) ([]LocationProvider, error) {
 	requestPath := "/v1/providers/summary"
 
 
@@ -219,7 +219,7 @@ func (p *Providers) GetAllProviderObjects(ctx context.Context) (*[]LocationProvi
 
 // GetAllProviderTrackables get all trackables which are linked to this provider.
 // Returns the ids of all trackables which are linked to the location provider with the given id.
-func (p *Providers) GetAllProviderTrackables(ctx context.Context, providerId string) (*[]string, error) {
+func (p *Providers) GetAllProviderTrackables(ctx context.Context, providerId string) ([]string, error) {
 	requestPath := "/v1/providers/{provider_id}/trackables"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -246,7 +246,7 @@ func (p *Providers) GetAllProviderTrackables(ctx context.Context, providerId str
 
 // GetInsideFenceForProvider get all fences the location provider is within.
 // Returns all fences for which the location providers is currently considered as being inside the respective fence, e.g., for which a region entry fence event was triggered.
-func (p *Providers) GetInsideFenceForProvider(ctx context.Context, providerId string, spatialQuery bool) (*[]Fence, error) {
+func (p *Providers) GetInsideFenceForProvider(ctx context.Context, providerId string, spatialQuery bool) ([]Fence, error) {
 	requestPath := "/v1/providers/{provider_id}/fences"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -308,7 +308,7 @@ func (p *Providers) GetLocationByProviderId(ctx context.Context, providerId stri
 
 // GetLocationProviderIds get an array of all location provider ids.
 // This function returns an array of ids of all available providers.
-func (p *Providers) GetLocationProviderIds(ctx context.Context) (*[]string, error) {
+func (p *Providers) GetLocationProviderIds(ctx context.Context) ([]string, error) {
 	requestPath := "/v1/providers"
 
 
