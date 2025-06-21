@@ -16,7 +16,7 @@ func ExampleNew() {
 		log.Fatal(err)
 	}
 
-	trackables, err := c.Trackables.List(context.Background())
+	trackables, err := c.GetAllTrackableObjects(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}

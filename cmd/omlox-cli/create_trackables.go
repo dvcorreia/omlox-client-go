@@ -59,7 +59,7 @@ func newCreateTrackablesCmd(settings cli.EnvSettings, out io.Writer) *cobra.Comm
 			}
 
 			for _, t := range loader.Resources {
-				rt, err := c.Trackables.Create(context.Background(), t)
+				rt, err := c.CreateNewTrackable(context.Background(), t)
 				if err != nil {
 					return err
 				}

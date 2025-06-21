@@ -49,7 +49,7 @@ func newDeleteTrackablesCmd(settings cli.EnvSettings, out io.Writer) *cobra.Comm
 					}
 				}
 
-				return c.Trackables.DeleteAll(context.Background())
+				return c.DeleteAllTrackables(context.Background())
 			}
 
 			id, err := uuid.Parse(args[0])
@@ -57,7 +57,7 @@ func newDeleteTrackablesCmd(settings cli.EnvSettings, out io.Writer) *cobra.Comm
 				return err
 			}
 
-			return c.Trackables.Delete(context.Background(), id)
+			return c.DeleteTrackableById(context.Background(), id.String())
 		},
 	}
 
@@ -75,14 +75,9 @@ func compListTrackables(toComplete string, ignoredTrackabeNames []string, settin
 		return nil, cobra.ShellCompDirectiveDefault
 	}
 
-	trackableUUIDs, err := c.Trackables.IDs(context.Background())
+	trackableIDs, err := c.GetAllTrackableIds(context.Background())
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveDefault
-	}
-
-	trackableIDs := make([]string, len(trackableUUIDs))
-	for i, id := range trackableUUIDs {
-		trackableIDs[i] = id.String()
 	}
 
 	return filterIDs(trackableIDs, ignoredTrackabeNames), cobra.ShellCompDirectiveNoFileComp

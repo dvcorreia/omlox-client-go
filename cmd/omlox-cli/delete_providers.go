@@ -50,11 +50,11 @@ func newDeleteProvidersCmd(settings cli.EnvSettings, out io.Writer) *cobra.Comma
 					}
 				}
 
-				return c.Providers.DeleteAll(context.Background())
+				return c.DeleteProviders(context.Background())
 			}
 
 			for _, arg := range args {
-				err := c.Providers.Delete(context.Background(), arg)
+				err := c.DeleteProviderById(context.Background(), arg)
 				if err != nil {
 					return err
 				}
@@ -79,7 +79,7 @@ func compListProviders(toComplete string, ignoredProviderNames []string, setting
 		return nil, cobra.ShellCompDirectiveDefault
 	}
 
-	providerIDs, err := c.Providers.IDs(context.Background())
+	providerIDs, err := c.GetLocationProviderIds(context.Background())
 	if err != nil {
 		return nil, cobra.ShellCompDirectiveDefault
 	}

@@ -60,7 +60,7 @@ func newCreateProvidersCmd(settings cli.EnvSettings, out io.Writer) *cobra.Comma
 			}
 
 			for _, p := range loader.Resources {
-				rt, err := c.Providers.Create(context.Background(), p)
+				rt, err := c.CreateLocationProvider(context.Background(), p)
 				if err != nil {
 					return err
 				}

@@ -31,7 +31,7 @@ func newGetTrackablesCmd(settings cli.EnvSettings, out io.Writer) *cobra.Command
 				return err
 			}
 
-			trackables, err := c.Trackables.List(context.Background())
+			trackables, err := c.GetAllTrackableObjects(context.Background())
 			if err != nil {
 				return err
 			}

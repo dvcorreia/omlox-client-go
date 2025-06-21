@@ -31,7 +31,7 @@ func newGetProvidersCmd(settings cli.EnvSettings, out io.Writer) *cobra.Command 
 				return err
 			}
 
-			providers, err := c.Providers.List(context.Background())
+			providers, err := c.GetAllProviderObjects(context.Background())
 			if err != nil {
 				return err
 			}
