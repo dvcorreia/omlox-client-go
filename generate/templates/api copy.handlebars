@@ -1,0 +1,62 @@
+{{>partial_header}}
+package {{packageName}}
+
+{{#with operations}}
+import (
+	"context"
+	"net/http"
+	"net/url"
+{{#each imports}}	"{{import}}"
+{{/each}}
+)
+
+// {{cut classname "Api"}} is a simple wrapper around the client for {{cut classname "Api"}} requests
+type {{cut classname "Api"}} struct {
+	client *Client
+}
+{{#each operation}}
+{{#if isDeprecated}}
+// Deprecated{{/if}}
+// {{operationId}} {{#if summary}}{{{summary}}}{{/if}}{{#if notes}}
+// {{{notes}}}{{/if}}
+func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}(ctx context.Context{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}, {{paramName}} {{{dataType}}}{{/endsWith}}{{/each}}{{#each bodyParams}}, request {{#if isModel}}schema.{{/if}}{{{dataType}}}{{/each}}{{#each queryParams}}{{#neq paramName "list"}}, {{paramName}} {{{dataType}}}{{/neq}}{{/each}}) ({{#with returnType}}{{{.}}}{{/with}}{{#unless returnType}}map[string]interface{}{{/unless}}, error) {
+	requestPath := "/v1{{{path}}}"{{#each pathParams}}{{#endsWith baseName "_mount_path"}}
+	requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape(requestModifiers.mountPathOr({{#with defaultValue}}{{{.}}}{{/with}})), -1){{/endsWith}}{{/each}}{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}
+    requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape({{paramName}}), -1){{/endsWith}}{{/each}}
+
+{{#if queryParams.length }}
+	requestQueryParameters := url.Values{}{{/if}}
+{{~#each queryParams}}
+{{~#eq paramName "list"}}
+	requestQueryParameters.Add("{{baseName}}", "true")
+{{~else}}
+	requestQueryParameters.Add("{{baseName}}", parameterToString({{paramName}}))
+{{~/eq}}
+{{~/each}}
+
+{{#each bodyParams}}
+	return sendStructuredRequestParseResponse[{{#with returnType}}schema.{{{.}}}{{/with}}{{#unless returnType}}map[string]interface{}{{/unless}}](
+		ctx,
+		{{lower (substring classname 0 1)}}.client,
+		http.Method{{httpMethod}},
+		requestPath,
+	 	request,
+		requestQueryParameters,
+		requestModifiers,
+	)
+{{/each}}
+{{#unless bodyParams}}
+	return sendRequestParseResponse[{{#with returnType}}schema.{{{.}}}{{/with}}{{#unless returnType}}map[string]interface{}{{/unless}}](
+		ctx,
+		{{lower (substring classname 0 1)}}.client,
+		http.Method{{httpMethod}},
+		requestPath,
+		nil,       // request body
+		requestQueryParameters,
+		requestModifiers,
+	)
+{{/unless}}
+}
+
+{{/each}}
+{{/with}}

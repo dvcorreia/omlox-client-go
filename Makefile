@@ -7,6 +7,15 @@ BUILD_DATE ?= $(shell date "$(DATE_FMT)") # "-u" for UTC time (zero offset)
 BUILD_DIR ?= bin
 LDFLAGS += "-X main.version=$(VERSION) -X main.commitHash=$(COMMIT_HASH) -X main.buildDate=$(BUILD_DATE)"
 
+OPENAPI_GENERATOR_VERSION   ?= v6.4.0
+OPENAPI_SPEC_PATH           ?= api/v2.openapi.json
+GENERATE_CONFIG_PATH        ?= generate/config.yaml
+GENERATE_TEMPLATES_PATH     ?= generate/templates
+OUTPUT_PATH                 ?= .
+
+# To pass extra options to openapi-generator-cli, set this:
+OPENAPI_GENERATOR_EXTRA_OPTIONS ?= --global-property debugOpenAPI=true,debugModels=true,apis,apiTests=false,apiDocs=false,generateAliasAsModel=false
+
 .DEFAULT_GOAL: help
 default: help
 
@@ -24,6 +33,20 @@ install:  ## Install binaries.
 
 gen: ## Generates code and documentation (see: ./gen.go).
 	go generate ./...
+
+gen-api:
+	docker run \
+		--rm \
+		--volume "${PWD}:/local" \
+		--user="$(shell id -u):$(shell id -g)" \
+			openapitools/openapi-generator-cli:$(OPENAPI_GENERATOR_VERSION) generate \
+				--generator-name   go \
+				--engine           "handlebars" \
+				--input-spec       /local/$(OPENAPI_SPEC_PATH) \
+				--config           /local/$(GENERATE_CONFIG_PATH) \
+				--template-dir     /local/$(GENERATE_TEMPLATES_PATH) \
+				--output           /local/$(OUTPUT_PATH) \
+				$(OPENAPI_GENERATOR_EXTRA_OPTIONS)
 
 ##@ Test and Lint
 

@@ -1,0 +1,116 @@
+{{>partial_header}}
+package {{packageName}}
+
+{{#with operations}}
+import (
+	"context"
+	"net/http"
+	"net/url"
+	"strings"
+{{#each imports}}	"{{import}}"
+{{/each}}
+)
+
+// {{cut classname "Api"}} is a simple wrapper around the client for {{cut classname "Api"}} requests
+type {{cut classname "Api"}} struct {
+	client *Client
+}
+{{#each operation}}
+{{#if isDeprecated}}
+// Deprecated{{/if}}
+// {{operationId}}{{#if summary}} {{lower (substring summary 0 1)}}{{substring summary 1}}{{/if}}{{#if notes}}
+// {{{notes}}}{{/if}}
+func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}(ctx context.Context{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}, {{paramName}} {{{dataType}}}{{/endsWith}}{{/each}}{{#each bodyParams}}, {{paramName}} {{{dataType}}}{{/each}}{{#each queryParams}}{{#neq paramName "list"}}, {{paramName}} {{{dataType}}}{{/neq}}{{/each}}) ({{#with returnType}}{{#if isListContainer}}{{{.}}}{{else}}*{{{.}}}{{/if}}, {{/with}}error) {
+	requestPath := "/v1{{{path}}}"{{#each pathParams}}{{#endsWith baseName "_mount_path"}}
+	requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape(requestModifiers.mountPathOr({{#with defaultValue}}{{{.}}}{{/with}})), -1){{/endsWith}}{{/each}}{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}
+	requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape({{paramName}}), -1){{/endsWith}}{{/each}}
+
+{{#if queryParams.length}}
+	requestQueryParameters := url.Values{}
+{{#each queryParams}}
+{{#eq paramName "list"}}
+	requestQueryParameters.Add("{{baseName}}", "true")
+{{else}}
+	requestQueryParameters.Add("{{baseName}}", parameterToString({{paramName}}))
+{{/eq}}
+{{/each}}
+{{/if}}
+
+{{#each bodyParams}}
+{{#with ../returnType}}
+{{#if ../isListContainer}}
+	return sendStructuredRequestParseResponseList[{{{../baseType}}}](
+{{else}}
+	return sendStructuredRequestParseResponse[{{{.}}}](
+{{/if}}
+		ctx,
+		{{lower (substring ../classname 0 1)}}.client,
+		http.Method{{../httpMethod}},
+		requestPath,
+		{{../paramName}},
+{{#if ../queryParams.length}}
+		requestQueryParameters,
+{{else}}
+		nil,
+{{/if}}
+		nil,
+	)
+{{/with}}
+{{#unless ../returnType}}
+	_, err := sendStructuredRequestParseResponse[any](
+		ctx,
+		{{lower (substring ../classname 0 1)}}.client,
+		http.Method{{../httpMethod}},
+		requestPath,
+		{{../paramName}},
+{{#if ../queryParams.length}}
+		requestQueryParameters,
+{{else}}
+		nil,
+{{/if}}
+		nil,
+	)
+	return err
+{{/unless}}
+{{/each}}
+{{#unless bodyParams}}
+{{#with returnType}}
+{{#if isListContainer}}
+	return sendRequestParseResponseList[{{{baseType}}}](
+{{else}}
+	return sendRequestParseResponse[{{{.}}}](
+{{/if}}
+		ctx,
+		{{lower (substring ../classname 0 1)}}.client,
+		http.Method{{../httpMethod}},
+		requestPath,
+		nil,
+{{#if ../queryParams.length}}
+		requestQueryParameters,
+{{else}}
+		nil,
+{{/if}}
+		nil,
+	)
+{{/with}}
+{{#unless returnType}}
+	_, err := sendRequestParseResponse[any](
+		ctx,
+		{{lower (substring classname 0 1)}}.client,
+		http.Method{{httpMethod}},
+		requestPath,
+		nil,
+{{#if queryParams.length}}
+		requestQueryParameters,
+{{else}}
+		nil,
+{{/if}}
+		nil,
+	)
+	return err
+{{/unless}}
+{{/unless}}
+}
+
+{{/each}}
+{{/with}}

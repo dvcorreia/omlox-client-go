@@ -1,0 +1,68 @@
+{{>partial_header}}
+package {{packageName}}
+
+{{#operations}}
+import (
+	"context"
+	"net/http"
+	"net/url"
+{{#imports}}	"{{import}}"
+{{/imports}}
+)
+
+// {{classname}} is a simple wrapper around the client for {{description}}{{^description}}{{classname}} requests{{/description}}.
+type {{classname}} struct {
+	client *Client
+}
+
+{{#operation}}
+{{#notes}}
+// {{{unescapedNotes}}}
+{{/notes}}
+{{^notes}}
+// {{nickname}} {{#summary}}{{{summary}}}{{/summary}}{{^summary}}handles {{operationId}}{{/summary}}.
+{{/notes}}
+func (c *{{classname}}) {{nickname}}(ctx context.Context{{#pathParams}}, {{paramName}} {{dataType}}{{/pathParams}}{{#hasBodyParams}}{{#bodyParams}}, {{paramName}} {{dataType}}{{/bodyParams}}{{/hasBodyParams}}{{#hasQueryParams}}, options ...RequestOption{{/hasQueryParams}}) {{#returnType}}({{#returnContainer}}[]{{/returnContainer}}{{^returnContainer}}{{^returnTypeIsPrimitive}}*{{/returnTypeIsPrimitive}}{{/returnContainer}}{{returnBaseType}}, error){{/returnType}}{{^returnType}}error{{/returnType}} {
+{{#hasQueryParams}}
+	requestModifiers, err := requestOptionsToRequestModifiers(options)
+	if err != nil {
+		return nil, err
+	}
+{{/hasQueryParams}}
+
+	requestPath := "{{path}}"{{#pathParams}}
+	requestPath = strings.Replace(requestPath, "{{{baseName}}}", url.PathEscape({{paramName}}), -1){{/pathParams}}
+
+{{#hasQueryParams}}
+	requestQueryParameters := requestModifiers.additionalQueryParametersOrDefault()
+{{#queryParams}}
+	requestQueryParameters.Add("{{baseName}}", parameterToString({{paramName}}))
+{{/queryParams}}
+{{/hasQueryParams}}
+
+{{#hasBodyParams}}
+	return sendStructuredRequestParseResponse[{{#returnType}}{{#returnContainer}}[]{{/returnContainer}}{{returnBaseType}}{{/returnType}}{{^returnType}}map[string]interface{}{{/returnType}}](
+		ctx,
+		c.client,
+		http.Method{{httpMethod}},
+		requestPath,
+		{{#bodyParams}}{{paramName}}{{/bodyParams}},
+		{{#hasQueryParams}}requestQueryParameters{{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+		{{#hasQueryParams}}requestModifiers{{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+	)
+{{/hasBodyParams}}
+{{^hasBodyParams}}
+	return sendRequestParseResponse[{{#returnType}}{{#returnContainer}}[]{{/returnContainer}}{{returnBaseType}}{{/returnType}}{{^returnType}}map[string]interface{}{{/returnType}}](
+		ctx,
+		c.client,
+		http.Method{{httpMethod}},
+		requestPath,
+		nil, // request body
+		{{#hasQueryParams}}requestQueryParameters{{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+		{{#hasQueryParams}}requestModifiers{{/hasQueryParams}}{{^hasQueryParams}}nil{{/hasQueryParams}},
+	)
+{{/hasBodyParams}}
+}
+
+{{/operation}}
+{{/operations}}

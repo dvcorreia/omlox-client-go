@@ -1,0 +1,6 @@
+# Copyright (c) Omlox Client Go Contributors
+# SPDX-License-Identifier: MIT
+
+additionalProperties:
+  packageName: omlox
+  packageVersion: 0.0.1
