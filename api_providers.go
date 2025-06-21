@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"strings"
 
 )
 
@@ -30,17 +29,13 @@ func (p *Providers) CreateLocationProvider(ctx context.Context, locationProvider
 
 
 
-
 	return sendStructuredRequestParseResponse[LocationProvider](
-
 		ctx,
 		p.client,
 		http.MethodPost,
 		requestPath,
 		locationProvider,
-
 		nil,
-
 		nil,
 	)
 
@@ -68,11 +63,10 @@ func (p *Providers) DeleteLocations(ctx context.Context) (error) {
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -98,11 +92,10 @@ func (p *Providers) DeleteProviderById(ctx context.Context, providerId string) (
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -128,11 +121,10 @@ func (p *Providers) DeleteProviderLocationById(ctx context.Context, providerId s
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -157,11 +149,10 @@ func (p *Providers) DeleteProviders(ctx context.Context) (error) {
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -175,36 +166,22 @@ func (p *Providers) GetAllLocations(ctx context.Context, crs string, zoneId stri
 	requestPath := "/v1/providers/locations"
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 
 
 
 
 	return sendRequestParseResponse[[]Location](
-
 		ctx,
 		p.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -224,17 +201,13 @@ func (p *Providers) GetAllProviderObjects(ctx context.Context) (*[]LocationProvi
 
 
 
-
 	return sendRequestParseResponse[[]LocationProvider](
-
 		ctx,
 		p.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -255,17 +228,13 @@ func (p *Providers) GetAllProviderTrackables(ctx context.Context, providerId str
 
 
 
-
 	return sendRequestParseResponse[[]string](
-
 		ctx,
 		p.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -282,28 +251,20 @@ func (p *Providers) GetInsideFenceForProvider(ctx context.Context, providerId st
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
 
 
 
 
 	return sendRequestParseResponse[[]Fence](
-
 		ctx,
 		p.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -320,36 +281,22 @@ func (p *Providers) GetLocationByProviderId(ctx context.Context, providerId stri
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 
 
 
 
 	return sendRequestParseResponse[Location](
-
 		ctx,
 		p.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -369,17 +316,13 @@ func (p *Providers) GetLocationProviderIds(ctx context.Context) (*[]string, erro
 
 
 
-
 	return sendRequestParseResponse[[]string](
-
 		ctx,
 		p.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -400,17 +343,13 @@ func (p *Providers) GetProviderById(ctx context.Context, providerId string) (*Lo
 
 
 
-
 	return sendRequestParseResponse[LocationProvider](
-
 		ctx,
 		p.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -431,17 +370,13 @@ func (p *Providers) GetSensorsByProviderId(ctx context.Context, providerId strin
 
 
 
-
 	return sendRequestParseResponse[AnyType](
-
 		ctx,
 		p.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -468,11 +403,10 @@ func (p *Providers) UpdateLocationByProviderId(ctx context.Context, providerId s
 		http.MethodPut,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -497,11 +431,10 @@ func (p *Providers) UpdateLocations(ctx context.Context, location []Location) (e
 		http.MethodPut,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -527,11 +460,10 @@ func (p *Providers) UpdateProviderById(ctx context.Context, providerId string, l
 		http.MethodPut,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -556,11 +488,10 @@ func (p *Providers) UpdateProximities(ctx context.Context, proximity []Proximity
 		http.MethodPut,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -586,11 +517,10 @@ func (p *Providers) UpdateProximityByProviderId(ctx context.Context, providerId 
 		http.MethodPut,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -616,11 +546,10 @@ func (p *Providers) UpdateSensorsByProviderId(ctx context.Context, providerId st
 		http.MethodPut,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 

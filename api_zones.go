@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"strings"
 
 )
 
@@ -32,17 +31,13 @@ func (z *Zones) CreateFenceFromZone(ctx context.Context, zoneId string) (*Fence,
 
 
 
-
 	return sendRequestParseResponse[Fence](
-
 		ctx,
 		z.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -61,17 +56,13 @@ func (z *Zones) CreateZone(ctx context.Context, zone Zone) (*Zone, error) {
 
 
 
-
 	return sendStructuredRequestParseResponse[Zone](
-
 		ctx,
 		z.client,
 		http.MethodPost,
 		requestPath,
 		zone,
-
 		nil,
-
 		nil,
 	)
 
@@ -99,11 +90,10 @@ func (z *Zones) DeleteAllZones(ctx context.Context) (error) {
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -129,11 +119,10 @@ func (z *Zones) DeleteZoneById(ctx context.Context, zoneId string) (error) {
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -151,17 +140,13 @@ func (z *Zones) GetAllZoneObjects(ctx context.Context) (*[]Zone, error) {
 
 
 
-
 	return sendRequestParseResponse[[]Zone](
-
 		ctx,
 		z.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -182,17 +167,13 @@ func (z *Zones) GetZoneById(ctx context.Context, zoneId string) (*Zone, error) {
 
 
 
-
 	return sendRequestParseResponse[Zone](
-
 		ctx,
 		z.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -208,28 +189,20 @@ func (z *Zones) GetZoneIds(ctx context.Context, foreignId string) (*[]string, er
 	requestPath := "/v1/zones"
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("foreign_id", parameterToString(foreignId))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("foreign_id", parameterToString(foreignId))
 
 
 
 
 
 	return sendRequestParseResponse[[]string](
-
 		ctx,
 		z.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -246,27 +219,19 @@ func (z *Zones) TransformByZoneId(ctx context.Context, zoneId string, simpleTran
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 
 
 
 	return sendStructuredRequestParseResponse[SimpleTransform](
-
 		ctx,
 		z.client,
 		http.MethodPut,
 		requestPath,
 		simpleTransform,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -294,11 +259,10 @@ func (z *Zones) UpdateZoneById(ctx context.Context, zoneId string, zone Zone) (e
 		http.MethodPut,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 

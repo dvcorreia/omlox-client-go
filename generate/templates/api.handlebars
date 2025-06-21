@@ -6,7 +6,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"strings"
 {{#each imports}}	"{{import}}"
 {{/each}}
 )
@@ -26,33 +25,33 @@ func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}
 	requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape({{paramName}}), -1){{/endsWith}}{{/each}}
 
 {{#if queryParams.length}}
-	requestQueryParameters := url.Values{}
-{{#each queryParams}}
-{{#eq paramName "list"}}
-	requestQueryParameters.Add("{{baseName}}", "true")
-{{else}}
-	requestQueryParameters.Add("{{baseName}}", parameterToString({{paramName}}))
-{{/eq}}
-{{/each}}
+   requestQueryParameters := url.Values{}
+{{~#each queryParams}}
+{{~#eq paramName "list"}}
+   requestQueryParameters.Add("{{baseName}}", "true")
+{{~else}}
+   requestQueryParameters.Add("{{baseName}}", parameterToString({{paramName}}))
+{{~/eq}}
+{{~/each}}
 {{/if}}
 
 {{#each bodyParams}}
 {{#with ../returnType}}
-{{#if ../isListContainer}}
+{{~#if ../isListContainer}}
 	return sendStructuredRequestParseResponseList[{{{../baseType}}}](
-{{else}}
+{{~else}}
 	return sendStructuredRequestParseResponse[{{{.}}}](
-{{/if}}
+{{~/if}}
 		ctx,
 		{{lower (substring ../classname 0 1)}}.client,
 		http.Method{{../httpMethod}},
 		requestPath,
 		{{#if ../paramName}}{{../paramName}}{{else}}nil{{/if}},
-{{#if ../queryParams.length}}
+{{~#if ../queryParams.length}}
 		requestQueryParameters,
-{{else}}
+{{~else}}
 		nil,
-{{/if}}
+{{~/if}}
 		nil,
 	)
 {{/with}}
@@ -63,33 +62,34 @@ func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}
 		http.Method{{../httpMethod}},
 		requestPath,
 		{{#if ../paramName}}{{../paramName}}{{else}}nil{{/if}},
-{{#if ../queryParams.length}}
+{{~#if ../queryParams.length}}
 		requestQueryParameters,
-{{else}}
+{{~else}}
 		nil,
-{{/if}}
+{{~/if}}
 		nil,
 	)
+
 	return err
 {{/unless}}
 {{/each}}
 {{#unless bodyParams}}
 {{#with returnType}}
-{{#if isListContainer}}
+{{~#if isListContainer}}
 	return sendRequestParseResponseList[{{{baseType}}}](
-{{else}}
+{{~else}}
 	return sendRequestParseResponse[{{{.}}}](
-{{/if}}
+{{~/if}}
 		ctx,
 		{{lower (substring ../classname 0 1)}}.client,
 		http.Method{{../httpMethod}},
 		requestPath,
 		nil,
-{{#if ../queryParams.length}}
+{{~#if ../queryParams.length}}
 		requestQueryParameters,
-{{else}}
+{{~else}}
 		nil,
-{{/if}}
+{{~/if}}
 		nil,
 	)
 {{/with}}
@@ -100,13 +100,14 @@ func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}
 		http.Method{{httpMethod}},
 		requestPath,
 		nil,
-{{#if queryParams.length}}
+{{~#if queryParams.length}}
 		requestQueryParameters,
-{{else}}
+{{~else}}
 		nil,
-{{/if}}
+{{~/if}}
 		nil,
 	)
+
 	return err
 {{/unless}}
 {{/unless}}

@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"strings"
 
 )
 
@@ -30,17 +29,13 @@ func (t *Trackables) CreateNewTrackable(ctx context.Context, trackable Trackable
 
 
 
-
 	return sendStructuredRequestParseResponse[Trackable](
-
 		ctx,
 		t.client,
 		http.MethodPost,
 		requestPath,
 		trackable,
-
 		nil,
-
 		nil,
 	)
 
@@ -68,11 +63,10 @@ func (t *Trackables) DeleteAllTrackables(ctx context.Context) (error) {
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -98,11 +92,10 @@ func (t *Trackables) DeleteTrackableById(ctx context.Context, trackableId string
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -120,17 +113,13 @@ func (t *Trackables) GetAllTrackableIds(ctx context.Context) (*[]string, error) 
 
 
 
-
 	return sendRequestParseResponse[[]string](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -147,36 +136,22 @@ func (t *Trackables) GetAllTrackableLocations(ctx context.Context, trackableId s
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 
 
 
 
 	return sendRequestParseResponse[[]Location](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -192,36 +167,22 @@ func (t *Trackables) GetAllTrackableMotions(ctx context.Context, crs string, zon
 	requestPath := "/v1/trackables/motions"
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 
 
 
 
 	return sendRequestParseResponse[[]TrackableMotion](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -241,17 +202,13 @@ func (t *Trackables) GetAllTrackableObjects(ctx context.Context) (*[]Trackable, 
 
 
 
-
 	return sendRequestParseResponse[[]Trackable](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -272,17 +229,13 @@ func (t *Trackables) GetAllTrackableProviders(ctx context.Context, trackableId s
 
 
 
-
 	return sendRequestParseResponse[[]string](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -303,17 +256,13 @@ func (t *Trackables) GetAllTrackableSensors(ctx context.Context, trackableId str
 
 
 
-
 	return sendRequestParseResponse[AnyType](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -330,28 +279,20 @@ func (t *Trackables) GetInsideFenceForTrackable(ctx context.Context, trackableId
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
 
 
 
 
 	return sendRequestParseResponse[[]Fence](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -368,36 +309,22 @@ func (t *Trackables) GetMostSignificantTrackableLocation(ctx context.Context, tr
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 
 
 
 
 	return sendRequestParseResponse[Location](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -418,17 +345,13 @@ func (t *Trackables) GetTrackableById(ctx context.Context, trackableId string) (
 
 
 
-
 	return sendRequestParseResponse[Trackable](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -445,36 +368,22 @@ func (t *Trackables) GetTrackableMotion(ctx context.Context, trackableId string,
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 
 
 
 
 	return sendRequestParseResponse[TrackableMotion](
-
 		ctx,
 		t.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -501,11 +410,10 @@ func (t *Trackables) UpdateTrackableById(ctx context.Context, trackableId string
 		http.MethodPut,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 

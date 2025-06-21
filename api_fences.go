@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"strings"
 
 )
 
@@ -30,17 +29,13 @@ func (f *Fences) CreateFence(ctx context.Context, fence Fence) (*Fence, error) {
 
 
 
-
 	return sendStructuredRequestParseResponse[Fence](
-
 		ctx,
 		f.client,
 		http.MethodPost,
 		requestPath,
 		fence,
-
 		nil,
-
 		nil,
 	)
 
@@ -69,11 +64,10 @@ func (f *Fences) DeleteFenceById(ctx context.Context, fenceId string) (error) {
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -98,11 +92,10 @@ func (f *Fences) DeleteFences(ctx context.Context) (error) {
 		http.MethodDelete,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
@@ -120,17 +113,13 @@ func (f *Fences) GetAllFenceIds(ctx context.Context) (*[]string, error) {
 
 
 
-
 	return sendRequestParseResponse[[]string](
-
 		ctx,
 		f.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
 
@@ -146,36 +135,22 @@ func (f *Fences) GetAllFences(ctx context.Context, crs string, zoneId string, ge
 	requestPath := "/v1/fences/summary"
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 
 
 
 
 	return sendRequestParseResponse[[]Fence](
-
 		ctx,
 		f.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -192,36 +167,22 @@ func (f *Fences) GetFenceById(ctx context.Context, fenceId string, crs string, z
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 
 
 
 
 	return sendRequestParseResponse[Fence](
-
 		ctx,
 		f.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -238,40 +199,23 @@ func (f *Fences) GetLocationsInsideFence(ctx context.Context, fenceId string, cr
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
-	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
+   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
 
 
 
 
 	return sendRequestParseResponse[[]Location](
-
 		ctx,
 		f.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -288,28 +232,20 @@ func (f *Fences) GetProvidersInsideFence(ctx context.Context, fenceId string, sp
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
 
 
 
 
 	return sendRequestParseResponse[[]LocationProvider](
-
 		ctx,
 		f.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -326,40 +262,23 @@ func (f *Fences) GetTrackableMotionsInsideFence(ctx context.Context, fenceId str
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("crs", parameterToString(crs))
-
-
-
-	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-
-
-
-	requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
-	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("crs", parameterToString(crs))
+   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+   requestQueryParameters.Add("geojson", parameterToString(geojson))
+   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
 
 
 
 
 	return sendRequestParseResponse[[]Location](
-
 		ctx,
 		f.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -376,28 +295,20 @@ func (f *Fences) GetTrackablesInside(ctx context.Context, fenceId string, spatia
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
 
-	requestQueryParameters := url.Values{}
-
-
-	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
+   requestQueryParameters := url.Values{}
+   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
 
 
 
 
 	return sendRequestParseResponse[[]Trackable](
-
 		ctx,
 		f.client,
 		http.MethodGet,
 		requestPath,
 		nil,
-
 		requestQueryParameters,
-
 		nil,
 	)
 
@@ -424,11 +335,10 @@ func (f *Fences) UpdateFenceById(ctx context.Context, fenceId string, fence Fenc
 		http.MethodPut,
 		requestPath,
 		nil,
-
 		nil,
-
 		nil,
 	)
+
 	return err
 
 
