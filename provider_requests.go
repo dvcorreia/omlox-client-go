@@ -8,13 +8,13 @@ import (
 	"net/http"
 )
 
-// ProvidersAPI is a simple wrapper around the client for location provider requests.
-type ProvidersAPI struct {
+// ProvidersAPI_ is a simple wrapper around the client for location provider requests.
+type ProvidersAPI_ struct {
 	client *Client
 }
 
 // List lists all location providers.
-func (c *ProvidersAPI) List(ctx context.Context) ([]LocationProvider, error) {
+func (c *ProvidersAPI_) List(ctx context.Context) ([]LocationProvider, error) {
 	requestPath := "/providers/summary"
 
 	return sendRequestParseResponseList[LocationProvider](
@@ -29,7 +29,7 @@ func (c *ProvidersAPI) List(ctx context.Context) ([]LocationProvider, error) {
 }
 
 // IDs lists all location providers IDs.
-func (c *ProvidersAPI) IDs(ctx context.Context) ([]string, error) {
+func (c *ProvidersAPI_) IDs(ctx context.Context) ([]string, error) {
 	requestPath := "/providers"
 
 	return sendRequestParseResponseList[string](
@@ -44,7 +44,7 @@ func (c *ProvidersAPI) IDs(ctx context.Context) ([]string, error) {
 }
 
 // Create creates a location provider.
-func (c *ProvidersAPI) Create(ctx context.Context, provider LocationProvider) (*LocationProvider, error) {
+func (c *ProvidersAPI_) Create(ctx context.Context, provider LocationProvider) (*LocationProvider, error) {
 	requestPath := "/providers"
 
 	return sendStructuredRequestParseResponse[LocationProvider](
@@ -59,7 +59,7 @@ func (c *ProvidersAPI) Create(ctx context.Context, provider LocationProvider) (*
 }
 
 // DeleteAll deletes all location providers.
-func (c *ProvidersAPI) DeleteAll(ctx context.Context) error {
+func (c *ProvidersAPI_) DeleteAll(ctx context.Context) error {
 	requestPath := "/providers"
 
 	_, err := sendRequestParseResponse[struct{}](
@@ -76,7 +76,7 @@ func (c *ProvidersAPI) DeleteAll(ctx context.Context) error {
 }
 
 // Get gets a location providers.
-func (c *ProvidersAPI) Get(ctx context.Context, id string) (*LocationProvider, error) {
+func (c *ProvidersAPI_) Get(ctx context.Context, id string) (*LocationProvider, error) {
 	requestPath := "/providers/" + id
 
 	return sendRequestParseResponse[LocationProvider](
@@ -91,7 +91,7 @@ func (c *ProvidersAPI) Get(ctx context.Context, id string) (*LocationProvider, e
 }
 
 // Delete deletes a location provider.
-func (c *ProvidersAPI) Delete(ctx context.Context, id string) error {
+func (c *ProvidersAPI_) Delete(ctx context.Context, id string) error {
 	requestPath := "/providers/" + id
 
 	_, err := sendRequestParseResponse[struct{}](

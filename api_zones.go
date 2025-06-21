@@ -12,13 +12,51 @@ import (
 	"strings"
 )
 
+// ZonesAPI defines the contract for Zones operations
+type ZonesAPI interface {
+
+	// CreateFenceFromZone create a fence object from a zone.
+	// Creates a geofence object using the ground control points of the zone with the given id.
+	CreateFenceFromZone(ctx context.Context, zoneId string) (*Fence, error)
+
+	// CreateZone create a zone.
+	// Creates a new zone and returns the created object.
+	CreateZone(ctx context.Context, zone Zone) (*Zone, error)
+
+	// DeleteAllZones delete all zones.
+	// This function deletes all zones known to the system.
+	DeleteAllZones(ctx context.Context) error
+
+	// DeleteZoneById delete a zone.
+	// Deletes the zone object with the given id.
+	DeleteZoneById(ctx context.Context, zoneId string) error
+
+	// GetAllZoneObjects get an array of all zones.
+	// Returns an array of all zone objects.
+	GetAllZoneObjects(ctx context.Context) ([]Zone, error)
+
+	// GetZoneById get a zone.
+	// Returns the zone object with the given id.
+	GetZoneById(ctx context.Context, zoneId string) (*Zone, error)
+
+	// GetZoneIds get an array of all zone ids.
+	// This function returns an array of ids of all available zones.
+	GetZoneIds(ctx context.Context, foreignId string) ([]string, error)
+
+	// TransformByZoneId transform a position within a zone to geographic coordinates.
+	// Transforms the coordinates of a position in the zone with the given id to geographic coordinates.
+	TransformByZoneId(ctx context.Context, zoneId string, simpleTransform SimpleTransform, geojson string) (*SimpleTransform, error)
+
+	// UpdateZoneById update a zone.
+	// Updates the zone object with the given id.
+	UpdateZoneById(ctx context.Context, zoneId string, zone Zone) error
+}
+
 // Zones is a simple wrapper around the client for Zones requests
 type Zones struct {
 	client *Client
 }
 
-// CreateFenceFromZone create a fence object from a zone.
-// Creates a geofence object using the ground control points of the zone with the given id.
 func (z *Zones) CreateFenceFromZone(ctx context.Context, zoneId string) (*Fence, error) {
 	requestPath := "/v1/zones/{zone_id}/createfence"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
@@ -35,8 +73,6 @@ func (z *Zones) CreateFenceFromZone(ctx context.Context, zoneId string) (*Fence,
 
 }
 
-// CreateZone create a zone.
-// Creates a new zone and returns the created object.
 func (z *Zones) CreateZone(ctx context.Context, zone Zone) (*Zone, error) {
 	requestPath := "/v1/zones"
 
@@ -52,8 +88,6 @@ func (z *Zones) CreateZone(ctx context.Context, zone Zone) (*Zone, error) {
 
 }
 
-// DeleteAllZones delete all zones.
-// This function deletes all zones known to the system.
 func (z *Zones) DeleteAllZones(ctx context.Context) error {
 	requestPath := "/v1/zones"
 
@@ -71,8 +105,6 @@ func (z *Zones) DeleteAllZones(ctx context.Context) error {
 
 }
 
-// DeleteZoneById delete a zone.
-// Deletes the zone object with the given id.
 func (z *Zones) DeleteZoneById(ctx context.Context, zoneId string) error {
 	requestPath := "/v1/zones/{zone_id}"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
@@ -91,8 +123,6 @@ func (z *Zones) DeleteZoneById(ctx context.Context, zoneId string) error {
 
 }
 
-// GetAllZoneObjects get an array of all zones.
-// Returns an array of all zone objects.
 func (z *Zones) GetAllZoneObjects(ctx context.Context) ([]Zone, error) {
 	requestPath := "/v1/zones/summary"
 
@@ -108,8 +138,6 @@ func (z *Zones) GetAllZoneObjects(ctx context.Context) ([]Zone, error) {
 
 }
 
-// GetZoneById get a zone.
-// Returns the zone object with the given id.
 func (z *Zones) GetZoneById(ctx context.Context, zoneId string) (*Zone, error) {
 	requestPath := "/v1/zones/{zone_id}"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
@@ -126,8 +154,6 @@ func (z *Zones) GetZoneById(ctx context.Context, zoneId string) (*Zone, error) {
 
 }
 
-// GetZoneIds get an array of all zone ids.
-// This function returns an array of ids of all available zones.
 func (z *Zones) GetZoneIds(ctx context.Context, foreignId string) ([]string, error) {
 	requestPath := "/v1/zones"
 
@@ -146,8 +172,6 @@ func (z *Zones) GetZoneIds(ctx context.Context, foreignId string) ([]string, err
 
 }
 
-// TransformByZoneId transform a position within a zone to geographic coordinates.
-// Transforms the coordinates of a position in the zone with the given id to geographic coordinates.
 func (z *Zones) TransformByZoneId(ctx context.Context, zoneId string, simpleTransform SimpleTransform, geojson string) (*SimpleTransform, error) {
 	requestPath := "/v1/zones/{zone_id}/transform"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
@@ -167,8 +191,6 @@ func (z *Zones) TransformByZoneId(ctx context.Context, zoneId string, simpleTran
 
 }
 
-// UpdateZoneById update a zone.
-// Updates the zone object with the given id.
 func (z *Zones) UpdateZoneById(ctx context.Context, zoneId string, zone Zone) error {
 	requestPath := "/v1/zones/{zone_id}"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)

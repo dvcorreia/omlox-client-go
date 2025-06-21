@@ -28,8 +28,10 @@ type Client struct {
 
 	client *http.Client
 
-	Trackables TrackablesAPI
-	Providers  ProvidersAPI
+	TrackablesAPI
+	ProvidersAPI
+	FencesAPI
+	ZonesAPI
 
 	// websockets client fields
 
@@ -89,11 +91,19 @@ func newClient(addr string, configuration ClientConfiguration) (*Client, error) 
 		subs: make(map[int]*Subcription),
 	}
 
-	c.Trackables = TrackablesAPI{
+	c.TrackablesAPI = &Trackables{
 		client: &c,
 	}
 
-	c.Providers = ProvidersAPI{
+	c.ProvidersAPI = &Providers{
+		client: &c,
+	}
+
+	c.FencesAPI = &Fences{
+		client: &c,
+	}
+
+	c.ZonesAPI = &Zones{
 		client: &c,
 	}
 

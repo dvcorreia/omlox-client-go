@@ -10,15 +10,21 @@ import (
 {{/each}}
 )
 
+// {{cut classname "Api"}}API defines the contract for {{cut classname "Api"}} operations
+type {{cut classname "Api"}}API interface {
+{{#each operation}}
+{{#if isDeprecated}}	// Deprecated{{/if}}
+	// {{operationId}}{{#if summary}} {{lower (substring summary 0 1)}}{{substring summary 1}}{{/if}}{{#if notes}}
+	// {{{notes}}}{{/if}}
+	{{nickname}}(ctx context.Context{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}, {{paramName}} {{{dataType}}}{{/endsWith}}{{/each}}{{#each bodyParams}}, {{paramName}} {{{dataType}}}{{/each}}{{#each queryParams}}{{#neq paramName "list"}}, {{paramName}} {{{dataType}}}{{/neq}}{{/each}}) ({{#with returnType}}{{#if returnContainer}}[]{{else}}*{{/if}}{{returnBaseType}}, {{/with}}error)
+{{/each}}
+}
+
 // {{cut classname "Api"}} is a simple wrapper around the client for {{cut classname "Api"}} requests
 type {{cut classname "Api"}} struct {
 	client *Client
 }
 {{#each operation}}
-{{#if isDeprecated}}
-// Deprecated{{/if}}
-// {{operationId}}{{#if summary}} {{lower (substring summary 0 1)}}{{substring summary 1}}{{/if}}{{#if notes}}
-// {{{notes}}}{{/if}}
 func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}(ctx context.Context{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}, {{paramName}} {{{dataType}}}{{/endsWith}}{{/each}}{{#each bodyParams}}, {{paramName}} {{{dataType}}}{{/each}}{{#each queryParams}}{{#neq paramName "list"}}, {{paramName}} {{{dataType}}}{{/neq}}{{/each}}) ({{#with returnType}}{{#if returnContainer}}[]{{else}}*{{/if}}{{returnBaseType}}, {{/with}}error) {
 	requestPath := "/v1{{{path}}}"{{#each pathParams}}{{#endsWith baseName "_mount_path"}}
 	requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape(requestModifiers.mountPathOr({{#with defaultValue}}{{{.}}}{{/with}})), -1){{/endsWith}}{{/each}}{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}

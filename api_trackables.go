@@ -12,13 +12,71 @@ import (
 	"strings"
 )
 
+// TrackablesAPI defines the contract for Trackables operations
+type TrackablesAPI interface {
+
+	// CreateNewTrackable create a trackable.
+	// Creates a new trackable with a randomly generated id.
+	CreateNewTrackable(ctx context.Context, trackable Trackable) (*Trackable, error)
+
+	// DeleteAllTrackables delete all trackables.
+	// This function deletes all trackables known to the system.
+	DeleteAllTrackables(ctx context.Context) error
+
+	// DeleteTrackableById delete a trackable.
+	// Deletes the trackable object with the given id.
+	DeleteTrackableById(ctx context.Context, trackableId string) error
+
+	// GetAllTrackableIds get an array of all trackable ids.
+	// This function returns an array of ids of all available trackables.
+	GetAllTrackableIds(ctx context.Context) ([]string, error)
+
+	// GetAllTrackableLocations get all locations.
+	// Returns the last known location of the trackable with the given id for all of its location providers.
+	GetAllTrackableLocations(ctx context.Context, trackableId string, crs string, zoneId string, geojson string) ([]Location, error)
+
+	// GetAllTrackableMotions get an array of all trackable motion objects.
+	// Returns an array of all trackable motion objects.
+	GetAllTrackableMotions(ctx context.Context, crs string, zoneId string, geojson string) ([]TrackableMotion, error)
+
+	// GetAllTrackableObjects get an array of all trackables.
+	// Returns an array of all trackable objects.
+	GetAllTrackableObjects(ctx context.Context) ([]Trackable, error)
+
+	// GetAllTrackableProviders get all providers linked to this trackable.
+	// Returns the ids of all location providers linked to the trackable with the given id.
+	GetAllTrackableProviders(ctx context.Context, trackableId string) ([]string, error)
+
+	// GetAllTrackableSensors get an array of sensor objects.
+	// Returns data from the sensors of all location providers associated with the trackable with the given id.
+	GetAllTrackableSensors(ctx context.Context, trackableId string) (*AnyType, error)
+
+	// GetInsideFenceForTrackable get all fences the trackable is within.
+	// Returns all fences for which the trackable is currently considered as being inside the respective fence, e.g., for which a region entry fence event was triggered.
+	GetInsideFenceForTrackable(ctx context.Context, trackableId string, spatialQuery bool) ([]Fence, error)
+
+	// GetMostSignificantTrackableLocation get a location.
+	// Returns the most significant location of the trackable with the given id, with consideration of all location updates from the trackable's location providers.
+	GetMostSignificantTrackableLocation(ctx context.Context, trackableId string, crs string, zoneId string, geojson string) (*Location, error)
+
+	// GetTrackableById get a trackable.
+	// Returns the trackable object with the given id.
+	GetTrackableById(ctx context.Context, trackableId string) (*Trackable, error)
+
+	// GetTrackableMotion get a motion.
+	// Returns the motion object for the trackable with the given id.
+	GetTrackableMotion(ctx context.Context, trackableId string, crs string, zoneId string, geojson string) (*TrackableMotion, error)
+
+	// UpdateTrackableById updates a trackable.
+	// Updates the trackable object with the given id.
+	UpdateTrackableById(ctx context.Context, trackableId string, trackable Trackable) error
+}
+
 // Trackables is a simple wrapper around the client for Trackables requests
 type Trackables struct {
 	client *Client
 }
 
-// CreateNewTrackable create a trackable.
-// Creates a new trackable with a randomly generated id.
 func (t *Trackables) CreateNewTrackable(ctx context.Context, trackable Trackable) (*Trackable, error) {
 	requestPath := "/v1/trackables"
 
@@ -34,8 +92,6 @@ func (t *Trackables) CreateNewTrackable(ctx context.Context, trackable Trackable
 
 }
 
-// DeleteAllTrackables delete all trackables.
-// This function deletes all trackables known to the system.
 func (t *Trackables) DeleteAllTrackables(ctx context.Context) error {
 	requestPath := "/v1/trackables"
 
@@ -53,8 +109,6 @@ func (t *Trackables) DeleteAllTrackables(ctx context.Context) error {
 
 }
 
-// DeleteTrackableById delete a trackable.
-// Deletes the trackable object with the given id.
 func (t *Trackables) DeleteTrackableById(ctx context.Context, trackableId string) error {
 	requestPath := "/v1/trackables/{trackable_id}"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
@@ -73,8 +127,6 @@ func (t *Trackables) DeleteTrackableById(ctx context.Context, trackableId string
 
 }
 
-// GetAllTrackableIds get an array of all trackable ids.
-// This function returns an array of ids of all available trackables.
 func (t *Trackables) GetAllTrackableIds(ctx context.Context) ([]string, error) {
 	requestPath := "/v1/trackables"
 
@@ -90,8 +142,6 @@ func (t *Trackables) GetAllTrackableIds(ctx context.Context) ([]string, error) {
 
 }
 
-// GetAllTrackableLocations get all locations.
-// Returns the last known location of the trackable with the given id for all of its location providers.
 func (t *Trackables) GetAllTrackableLocations(ctx context.Context, trackableId string, crs string, zoneId string, geojson string) ([]Location, error) {
 	requestPath := "/v1/trackables/{trackable_id}/locations"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
@@ -113,8 +163,6 @@ func (t *Trackables) GetAllTrackableLocations(ctx context.Context, trackableId s
 
 }
 
-// GetAllTrackableMotions get an array of all trackable motion objects.
-// Returns an array of all trackable motion objects.
 func (t *Trackables) GetAllTrackableMotions(ctx context.Context, crs string, zoneId string, geojson string) ([]TrackableMotion, error) {
 	requestPath := "/v1/trackables/motions"
 
@@ -135,8 +183,6 @@ func (t *Trackables) GetAllTrackableMotions(ctx context.Context, crs string, zon
 
 }
 
-// GetAllTrackableObjects get an array of all trackables.
-// Returns an array of all trackable objects.
 func (t *Trackables) GetAllTrackableObjects(ctx context.Context) ([]Trackable, error) {
 	requestPath := "/v1/trackables/summary"
 
@@ -152,8 +198,6 @@ func (t *Trackables) GetAllTrackableObjects(ctx context.Context) ([]Trackable, e
 
 }
 
-// GetAllTrackableProviders get all providers linked to this trackable.
-// Returns the ids of all location providers linked to the trackable with the given id.
 func (t *Trackables) GetAllTrackableProviders(ctx context.Context, trackableId string) ([]string, error) {
 	requestPath := "/v1/trackables/{trackable_id}/providers"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
@@ -170,8 +214,6 @@ func (t *Trackables) GetAllTrackableProviders(ctx context.Context, trackableId s
 
 }
 
-// GetAllTrackableSensors get an array of sensor objects.
-// Returns data from the sensors of all location providers associated with the trackable with the given id.
 func (t *Trackables) GetAllTrackableSensors(ctx context.Context, trackableId string) (*AnyType, error) {
 	requestPath := "/v1/trackables/{trackable_id}/sensors"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
@@ -188,8 +230,6 @@ func (t *Trackables) GetAllTrackableSensors(ctx context.Context, trackableId str
 
 }
 
-// GetInsideFenceForTrackable get all fences the trackable is within.
-// Returns all fences for which the trackable is currently considered as being inside the respective fence, e.g., for which a region entry fence event was triggered.
 func (t *Trackables) GetInsideFenceForTrackable(ctx context.Context, trackableId string, spatialQuery bool) ([]Fence, error) {
 	requestPath := "/v1/trackables/{trackable_id}/fences"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
@@ -209,8 +249,6 @@ func (t *Trackables) GetInsideFenceForTrackable(ctx context.Context, trackableId
 
 }
 
-// GetMostSignificantTrackableLocation get a location.
-// Returns the most significant location of the trackable with the given id, with consideration of all location updates from the trackable's location providers.
 func (t *Trackables) GetMostSignificantTrackableLocation(ctx context.Context, trackableId string, crs string, zoneId string, geojson string) (*Location, error) {
 	requestPath := "/v1/trackables/{trackable_id}/location"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
@@ -232,8 +270,6 @@ func (t *Trackables) GetMostSignificantTrackableLocation(ctx context.Context, tr
 
 }
 
-// GetTrackableById get a trackable.
-// Returns the trackable object with the given id.
 func (t *Trackables) GetTrackableById(ctx context.Context, trackableId string) (*Trackable, error) {
 	requestPath := "/v1/trackables/{trackable_id}"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
@@ -250,8 +286,6 @@ func (t *Trackables) GetTrackableById(ctx context.Context, trackableId string) (
 
 }
 
-// GetTrackableMotion get a motion.
-// Returns the motion object for the trackable with the given id.
 func (t *Trackables) GetTrackableMotion(ctx context.Context, trackableId string, crs string, zoneId string, geojson string) (*TrackableMotion, error) {
 	requestPath := "/v1/trackables/{trackable_id}/motion"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
@@ -273,8 +307,6 @@ func (t *Trackables) GetTrackableMotion(ctx context.Context, trackableId string,
 
 }
 
-// UpdateTrackableById updates a trackable.
-// Updates the trackable object with the given id.
 func (t *Trackables) UpdateTrackableById(ctx context.Context, trackableId string, trackable Trackable) error {
 	requestPath := "/v1/trackables/{trackable_id}"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
