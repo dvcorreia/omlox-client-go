@@ -5,13 +5,11 @@
 
 package omlox
 
-
 import (
 	"context"
 	"net/http"
 	"net/url"
 	"strings"
-
 )
 
 // Fences is a simple wrapper around the client for Fences requests
@@ -19,15 +17,10 @@ type Fences struct {
 	client *Client
 }
 
-
 // CreateFence create a fence.
 // Creates a new fence and returns the created object.
 func (f *Fences) CreateFence(ctx context.Context, fence Fence) (*Fence, error) {
 	requestPath := "/v1/fences"
-
-
-
-
 
 	return sendStructuredRequestParseResponse[Fence](
 		ctx,
@@ -39,25 +32,14 @@ func (f *Fences) CreateFence(ctx context.Context, fence Fence) (*Fence, error) {
 		nil,
 	)
 
-
-
-
 }
-
-
 
 // DeleteFenceById delete a fence.
 // Deletes the fence object with the given id.
-func (f *Fences) DeleteFenceById(ctx context.Context, fenceId string) (error) {
+func (f *Fences) DeleteFenceById(ctx context.Context, fenceId string) error {
 	requestPath := "/v1/fences/{fence_id}"
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
-
-
-
-
-
-
 	_, err := sendRequestParseResponse[any](
 		ctx,
 		f.client,
@@ -70,21 +52,12 @@ func (f *Fences) DeleteFenceById(ctx context.Context, fenceId string) (error) {
 
 	return err
 
-
 }
-
-
 
 // DeleteFences delete all fences.
 // This function deletes all fences known to the system.
-func (f *Fences) DeleteFences(ctx context.Context) (error) {
+func (f *Fences) DeleteFences(ctx context.Context) error {
 	requestPath := "/v1/fences"
-
-
-
-
-
-
 
 	_, err := sendRequestParseResponse[any](
 		ctx,
@@ -98,22 +71,14 @@ func (f *Fences) DeleteFences(ctx context.Context) (error) {
 
 	return err
 
-
 }
-
-
 
 // GetAllFenceIds get an array of all fence ids.
 // This function returns an array of ids of all available fences.
 func (f *Fences) GetAllFenceIds(ctx context.Context) ([]string, error) {
 	requestPath := "/v1/fences"
 
-
-
-
-
-
-	return sendRequestParseResponse[[]string](
+	return sendRequestParseResponseList[string](
 		ctx,
 		f.client,
 		http.MethodGet,
@@ -123,28 +88,19 @@ func (f *Fences) GetAllFenceIds(ctx context.Context) ([]string, error) {
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetAllFences get an array of all fences.
 // Returns an array of all fence objects.
 func (f *Fences) GetAllFences(ctx context.Context, crs string, zoneId string, geojson string) ([]Fence, error) {
 	requestPath := "/v1/fences/summary"
 
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("crs", parameterToString(crs))
+	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+	requestQueryParameters.Add("geojson", parameterToString(geojson))
 
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("crs", parameterToString(crs))
-   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-   requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
-
-
-	return sendRequestParseResponse[[]Fence](
+	return sendRequestParseResponseList[Fence](
 		ctx,
 		f.client,
 		http.MethodGet,
@@ -154,11 +110,7 @@ func (f *Fences) GetAllFences(ctx context.Context, crs string, zoneId string, ge
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetFenceById get a fence.
 // Returns the fence object with the given id.
@@ -166,15 +118,10 @@ func (f *Fences) GetFenceById(ctx context.Context, fenceId string, crs string, z
 	requestPath := "/v1/fences/{fence_id}"
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
-
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("crs", parameterToString(crs))
-   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-   requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
-
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("crs", parameterToString(crs))
+	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+	requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 	return sendRequestParseResponse[Fence](
 		ctx,
@@ -186,11 +133,7 @@ func (f *Fences) GetFenceById(ctx context.Context, fenceId string, crs string, z
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetLocationsInsideFence get location data of all location providers within a fence.
 // Returns locations of location providers which are currently considered as being inside the given fence, e.g., for which a region entry fence event was triggered.
@@ -198,18 +141,13 @@ func (f *Fences) GetLocationsInsideFence(ctx context.Context, fenceId string, cr
 	requestPath := "/v1/fences/{fence_id}/locations"
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("crs", parameterToString(crs))
+	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+	requestQueryParameters.Add("geojson", parameterToString(geojson))
+	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("crs", parameterToString(crs))
-   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-   requestQueryParameters.Add("geojson", parameterToString(geojson))
-   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
-
-
-	return sendRequestParseResponse[[]Location](
+	return sendRequestParseResponseList[Location](
 		ctx,
 		f.client,
 		http.MethodGet,
@@ -219,11 +157,7 @@ func (f *Fences) GetLocationsInsideFence(ctx context.Context, fenceId string, cr
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetProvidersInsideFence get all location providers within a fence.
 // Returns location providers which have a location that is currently considered as being inside the given fence, e.g., for which a region entry fence event was triggered.
@@ -231,15 +165,10 @@ func (f *Fences) GetProvidersInsideFence(ctx context.Context, fenceId string, sp
 	requestPath := "/v1/fences/{fence_id}/providers"
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
-
-
-	return sendRequestParseResponse[[]LocationProvider](
+	return sendRequestParseResponseList[LocationProvider](
 		ctx,
 		f.client,
 		http.MethodGet,
@@ -249,11 +178,7 @@ func (f *Fences) GetProvidersInsideFence(ctx context.Context, fenceId string, sp
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetTrackableMotionsInsideFence get motion data of all trackables within a fence.
 // Returns motions of trackables which are currently considered as being inside the given fence, e.g., for which a region entry fence event was triggered.
@@ -261,18 +186,13 @@ func (f *Fences) GetTrackableMotionsInsideFence(ctx context.Context, fenceId str
 	requestPath := "/v1/fences/{fence_id}/motions"
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("crs", parameterToString(crs))
+	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+	requestQueryParameters.Add("geojson", parameterToString(geojson))
+	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("crs", parameterToString(crs))
-   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-   requestQueryParameters.Add("geojson", parameterToString(geojson))
-   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
-
-
-	return sendRequestParseResponse[[]Location](
+	return sendRequestParseResponseList[Location](
 		ctx,
 		f.client,
 		http.MethodGet,
@@ -282,11 +202,7 @@ func (f *Fences) GetTrackableMotionsInsideFence(ctx context.Context, fenceId str
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetTrackablesInside get all trackables within a fence.
 // Returns trackables which have a location that is currently considered as being inside the given fence, e.g., for which a region entry fence event was triggered.
@@ -294,15 +210,10 @@ func (f *Fences) GetTrackablesInside(ctx context.Context, fenceId string, spatia
 	requestPath := "/v1/fences/{fence_id}/trackables"
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
 
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
-
-
-	return sendRequestParseResponse[[]Trackable](
+	return sendRequestParseResponseList[Trackable](
 		ctx,
 		f.client,
 		http.MethodGet,
@@ -312,22 +223,13 @@ func (f *Fences) GetTrackablesInside(ctx context.Context, fenceId string, spatia
 		nil,
 	)
 
-
-
 }
-
-
 
 // UpdateFenceById update a fence.
 // Updates the fence object with the given id.
-func (f *Fences) UpdateFenceById(ctx context.Context, fenceId string, fence Fence) (error) {
+func (f *Fences) UpdateFenceById(ctx context.Context, fenceId string, fence Fence) error {
 	requestPath := "/v1/fences/{fence_id}"
 	requestPath = strings.Replace(requestPath, "{"+"fence_id"+"}", url.PathEscape(fenceId), -1)
-
-
-
-
-
 
 	_, err := sendStructuredRequestParseResponse[any](
 		ctx,
@@ -341,8 +243,4 @@ func (f *Fences) UpdateFenceById(ctx context.Context, fenceId string, fence Fenc
 
 	return err
 
-
-
 }
-
-

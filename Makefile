@@ -47,6 +47,7 @@ gen-api:
 				--template-dir     /local/$(GENERATE_TEMPLATES_PATH) \
 				--output           /local/$(OUTPUT_PATH) \
 				$(OPENAPI_GENERATOR_EXTRA_OPTIONS)
+	gofmt -w api_*.go
 
 ##@ Test and Lint
 

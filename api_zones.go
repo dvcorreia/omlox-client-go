@@ -5,13 +5,11 @@
 
 package omlox
 
-
 import (
 	"context"
 	"net/http"
 	"net/url"
 	"strings"
-
 )
 
 // Zones is a simple wrapper around the client for Zones requests
@@ -19,17 +17,11 @@ type Zones struct {
 	client *Client
 }
 
-
 // CreateFenceFromZone create a fence object from a zone.
 // Creates a geofence object using the ground control points of the zone with the given id.
 func (z *Zones) CreateFenceFromZone(ctx context.Context, zoneId string) (*Fence, error) {
 	requestPath := "/v1/zones/{zone_id}/createfence"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
-
-
-
-
-
 
 	return sendRequestParseResponse[Fence](
 		ctx,
@@ -41,20 +33,12 @@ func (z *Zones) CreateFenceFromZone(ctx context.Context, zoneId string) (*Fence,
 		nil,
 	)
 
-
-
 }
-
-
 
 // CreateZone create a zone.
 // Creates a new zone and returns the created object.
 func (z *Zones) CreateZone(ctx context.Context, zone Zone) (*Zone, error) {
 	requestPath := "/v1/zones"
-
-
-
-
 
 	return sendStructuredRequestParseResponse[Zone](
 		ctx,
@@ -66,23 +50,12 @@ func (z *Zones) CreateZone(ctx context.Context, zone Zone) (*Zone, error) {
 		nil,
 	)
 
-
-
-
 }
-
-
 
 // DeleteAllZones delete all zones.
 // This function deletes all zones known to the system.
-func (z *Zones) DeleteAllZones(ctx context.Context) (error) {
+func (z *Zones) DeleteAllZones(ctx context.Context) error {
 	requestPath := "/v1/zones"
-
-
-
-
-
-
 
 	_, err := sendRequestParseResponse[any](
 		ctx,
@@ -96,22 +69,13 @@ func (z *Zones) DeleteAllZones(ctx context.Context) (error) {
 
 	return err
 
-
 }
-
-
 
 // DeleteZoneById delete a zone.
 // Deletes the zone object with the given id.
-func (z *Zones) DeleteZoneById(ctx context.Context, zoneId string) (error) {
+func (z *Zones) DeleteZoneById(ctx context.Context, zoneId string) error {
 	requestPath := "/v1/zones/{zone_id}"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
-
-
-
-
-
-
 
 	_, err := sendRequestParseResponse[any](
 		ctx,
@@ -125,22 +89,14 @@ func (z *Zones) DeleteZoneById(ctx context.Context, zoneId string) (error) {
 
 	return err
 
-
 }
-
-
 
 // GetAllZoneObjects get an array of all zones.
 // Returns an array of all zone objects.
 func (z *Zones) GetAllZoneObjects(ctx context.Context) ([]Zone, error) {
 	requestPath := "/v1/zones/summary"
 
-
-
-
-
-
-	return sendRequestParseResponse[[]Zone](
+	return sendRequestParseResponseList[Zone](
 		ctx,
 		z.client,
 		http.MethodGet,
@@ -150,22 +106,13 @@ func (z *Zones) GetAllZoneObjects(ctx context.Context) ([]Zone, error) {
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetZoneById get a zone.
 // Returns the zone object with the given id.
 func (z *Zones) GetZoneById(ctx context.Context, zoneId string) (*Zone, error) {
 	requestPath := "/v1/zones/{zone_id}"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
-
-
-
-
-
 
 	return sendRequestParseResponse[Zone](
 		ctx,
@@ -177,26 +124,17 @@ func (z *Zones) GetZoneById(ctx context.Context, zoneId string) (*Zone, error) {
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetZoneIds get an array of all zone ids.
 // This function returns an array of ids of all available zones.
 func (z *Zones) GetZoneIds(ctx context.Context, foreignId string) ([]string, error) {
 	requestPath := "/v1/zones"
 
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("foreign_id", parameterToString(foreignId))
 
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("foreign_id", parameterToString(foreignId))
-
-
-
-
-
-	return sendRequestParseResponse[[]string](
+	return sendRequestParseResponseList[string](
 		ctx,
 		z.client,
 		http.MethodGet,
@@ -206,11 +144,7 @@ func (z *Zones) GetZoneIds(ctx context.Context, foreignId string) ([]string, err
 		nil,
 	)
 
-
-
 }
-
-
 
 // TransformByZoneId transform a position within a zone to geographic coordinates.
 // Transforms the coordinates of a position in the zone with the given id to geographic coordinates.
@@ -218,12 +152,8 @@ func (z *Zones) TransformByZoneId(ctx context.Context, zoneId string, simpleTran
 	requestPath := "/v1/zones/{zone_id}/transform"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
 
-
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 	return sendStructuredRequestParseResponse[SimpleTransform](
 		ctx,
@@ -235,23 +165,13 @@ func (z *Zones) TransformByZoneId(ctx context.Context, zoneId string, simpleTran
 		nil,
 	)
 
-
-
-
 }
-
-
 
 // UpdateZoneById update a zone.
 // Updates the zone object with the given id.
-func (z *Zones) UpdateZoneById(ctx context.Context, zoneId string, zone Zone) (error) {
+func (z *Zones) UpdateZoneById(ctx context.Context, zoneId string, zone Zone) error {
 	requestPath := "/v1/zones/{zone_id}"
 	requestPath = strings.Replace(requestPath, "{"+"zone_id"+"}", url.PathEscape(zoneId), -1)
-
-
-
-
-
 
 	_, err := sendStructuredRequestParseResponse[any](
 		ctx,
@@ -265,8 +185,4 @@ func (z *Zones) UpdateZoneById(ctx context.Context, zoneId string, zone Zone) (e
 
 	return err
 
-
-
 }
-
-

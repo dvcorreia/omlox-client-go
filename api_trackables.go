@@ -5,13 +5,11 @@
 
 package omlox
 
-
 import (
 	"context"
 	"net/http"
 	"net/url"
 	"strings"
-
 )
 
 // Trackables is a simple wrapper around the client for Trackables requests
@@ -19,15 +17,10 @@ type Trackables struct {
 	client *Client
 }
 
-
 // CreateNewTrackable create a trackable.
 // Creates a new trackable with a randomly generated id.
 func (t *Trackables) CreateNewTrackable(ctx context.Context, trackable Trackable) (*Trackable, error) {
 	requestPath := "/v1/trackables"
-
-
-
-
 
 	return sendStructuredRequestParseResponse[Trackable](
 		ctx,
@@ -39,23 +32,12 @@ func (t *Trackables) CreateNewTrackable(ctx context.Context, trackable Trackable
 		nil,
 	)
 
-
-
-
 }
-
-
 
 // DeleteAllTrackables delete all trackables.
 // This function deletes all trackables known to the system.
-func (t *Trackables) DeleteAllTrackables(ctx context.Context) (error) {
+func (t *Trackables) DeleteAllTrackables(ctx context.Context) error {
 	requestPath := "/v1/trackables"
-
-
-
-
-
-
 
 	_, err := sendRequestParseResponse[any](
 		ctx,
@@ -69,22 +51,13 @@ func (t *Trackables) DeleteAllTrackables(ctx context.Context) (error) {
 
 	return err
 
-
 }
-
-
 
 // DeleteTrackableById delete a trackable.
 // Deletes the trackable object with the given id.
-func (t *Trackables) DeleteTrackableById(ctx context.Context, trackableId string) (error) {
+func (t *Trackables) DeleteTrackableById(ctx context.Context, trackableId string) error {
 	requestPath := "/v1/trackables/{trackable_id}"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
-
-
-
-
-
-
 
 	_, err := sendRequestParseResponse[any](
 		ctx,
@@ -98,22 +71,14 @@ func (t *Trackables) DeleteTrackableById(ctx context.Context, trackableId string
 
 	return err
 
-
 }
-
-
 
 // GetAllTrackableIds get an array of all trackable ids.
 // This function returns an array of ids of all available trackables.
 func (t *Trackables) GetAllTrackableIds(ctx context.Context) ([]string, error) {
 	requestPath := "/v1/trackables"
 
-
-
-
-
-
-	return sendRequestParseResponse[[]string](
+	return sendRequestParseResponseList[string](
 		ctx,
 		t.client,
 		http.MethodGet,
@@ -123,11 +88,7 @@ func (t *Trackables) GetAllTrackableIds(ctx context.Context) ([]string, error) {
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetAllTrackableLocations get all locations.
 // Returns the last known location of the trackable with the given id for all of its location providers.
@@ -135,17 +96,12 @@ func (t *Trackables) GetAllTrackableLocations(ctx context.Context, trackableId s
 	requestPath := "/v1/trackables/{trackable_id}/locations"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
 
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("crs", parameterToString(crs))
+	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+	requestQueryParameters.Add("geojson", parameterToString(geojson))
 
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("crs", parameterToString(crs))
-   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-   requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
-
-
-	return sendRequestParseResponse[[]Location](
+	return sendRequestParseResponseList[Location](
 		ctx,
 		t.client,
 		http.MethodGet,
@@ -155,28 +111,19 @@ func (t *Trackables) GetAllTrackableLocations(ctx context.Context, trackableId s
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetAllTrackableMotions get an array of all trackable motion objects.
 // Returns an array of all trackable motion objects.
 func (t *Trackables) GetAllTrackableMotions(ctx context.Context, crs string, zoneId string, geojson string) ([]TrackableMotion, error) {
 	requestPath := "/v1/trackables/motions"
 
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("crs", parameterToString(crs))
+	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+	requestQueryParameters.Add("geojson", parameterToString(geojson))
 
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("crs", parameterToString(crs))
-   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-   requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
-
-
-	return sendRequestParseResponse[[]TrackableMotion](
+	return sendRequestParseResponseList[TrackableMotion](
 		ctx,
 		t.client,
 		http.MethodGet,
@@ -186,23 +133,14 @@ func (t *Trackables) GetAllTrackableMotions(ctx context.Context, crs string, zon
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetAllTrackableObjects get an array of all trackables.
 // Returns an array of all trackable objects.
 func (t *Trackables) GetAllTrackableObjects(ctx context.Context) ([]Trackable, error) {
 	requestPath := "/v1/trackables/summary"
 
-
-
-
-
-
-	return sendRequestParseResponse[[]Trackable](
+	return sendRequestParseResponseList[Trackable](
 		ctx,
 		t.client,
 		http.MethodGet,
@@ -212,11 +150,7 @@ func (t *Trackables) GetAllTrackableObjects(ctx context.Context) ([]Trackable, e
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetAllTrackableProviders get all providers linked to this trackable.
 // Returns the ids of all location providers linked to the trackable with the given id.
@@ -224,12 +158,7 @@ func (t *Trackables) GetAllTrackableProviders(ctx context.Context, trackableId s
 	requestPath := "/v1/trackables/{trackable_id}/providers"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
 
-
-
-
-
-
-	return sendRequestParseResponse[[]string](
+	return sendRequestParseResponseList[string](
 		ctx,
 		t.client,
 		http.MethodGet,
@@ -239,22 +168,13 @@ func (t *Trackables) GetAllTrackableProviders(ctx context.Context, trackableId s
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetAllTrackableSensors get an array of sensor objects.
 // Returns data from the sensors of all location providers associated with the trackable with the given id.
 func (t *Trackables) GetAllTrackableSensors(ctx context.Context, trackableId string) (*AnyType, error) {
 	requestPath := "/v1/trackables/{trackable_id}/sensors"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
-
-
-
-
-
 
 	return sendRequestParseResponse[AnyType](
 		ctx,
@@ -266,11 +186,7 @@ func (t *Trackables) GetAllTrackableSensors(ctx context.Context, trackableId str
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetInsideFenceForTrackable get all fences the trackable is within.
 // Returns all fences for which the trackable is currently considered as being inside the respective fence, e.g., for which a region entry fence event was triggered.
@@ -278,15 +194,10 @@ func (t *Trackables) GetInsideFenceForTrackable(ctx context.Context, trackableId
 	requestPath := "/v1/trackables/{trackable_id}/fences"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
 
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
 
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("spatial_query", parameterToString(spatialQuery))
-
-
-
-
-
-	return sendRequestParseResponse[[]Fence](
+	return sendRequestParseResponseList[Fence](
 		ctx,
 		t.client,
 		http.MethodGet,
@@ -296,11 +207,7 @@ func (t *Trackables) GetInsideFenceForTrackable(ctx context.Context, trackableId
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetMostSignificantTrackableLocation get a location.
 // Returns the most significant location of the trackable with the given id, with consideration of all location updates from the trackable's location providers.
@@ -308,15 +215,10 @@ func (t *Trackables) GetMostSignificantTrackableLocation(ctx context.Context, tr
 	requestPath := "/v1/trackables/{trackable_id}/location"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
 
-
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("crs", parameterToString(crs))
-   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-   requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
-
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("crs", parameterToString(crs))
+	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+	requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 	return sendRequestParseResponse[Location](
 		ctx,
@@ -328,22 +230,13 @@ func (t *Trackables) GetMostSignificantTrackableLocation(ctx context.Context, tr
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetTrackableById get a trackable.
 // Returns the trackable object with the given id.
 func (t *Trackables) GetTrackableById(ctx context.Context, trackableId string) (*Trackable, error) {
 	requestPath := "/v1/trackables/{trackable_id}"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
-
-
-
-
-
 
 	return sendRequestParseResponse[Trackable](
 		ctx,
@@ -355,11 +248,7 @@ func (t *Trackables) GetTrackableById(ctx context.Context, trackableId string) (
 		nil,
 	)
 
-
-
 }
-
-
 
 // GetTrackableMotion get a motion.
 // Returns the motion object for the trackable with the given id.
@@ -367,15 +256,10 @@ func (t *Trackables) GetTrackableMotion(ctx context.Context, trackableId string,
 	requestPath := "/v1/trackables/{trackable_id}/motion"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
 
-
-   requestQueryParameters := url.Values{}
-   requestQueryParameters.Add("crs", parameterToString(crs))
-   requestQueryParameters.Add("zone_id", parameterToString(zoneId))
-   requestQueryParameters.Add("geojson", parameterToString(geojson))
-
-
-
-
+	requestQueryParameters := url.Values{}
+	requestQueryParameters.Add("crs", parameterToString(crs))
+	requestQueryParameters.Add("zone_id", parameterToString(zoneId))
+	requestQueryParameters.Add("geojson", parameterToString(geojson))
 
 	return sendRequestParseResponse[TrackableMotion](
 		ctx,
@@ -387,22 +271,13 @@ func (t *Trackables) GetTrackableMotion(ctx context.Context, trackableId string,
 		nil,
 	)
 
-
-
 }
-
-
 
 // UpdateTrackableById updates a trackable.
 // Updates the trackable object with the given id.
-func (t *Trackables) UpdateTrackableById(ctx context.Context, trackableId string, trackable Trackable) (error) {
+func (t *Trackables) UpdateTrackableById(ctx context.Context, trackableId string, trackable Trackable) error {
 	requestPath := "/v1/trackables/{trackable_id}"
 	requestPath = strings.Replace(requestPath, "{"+"trackable_id"+"}", url.PathEscape(trackableId), -1)
-
-
-
-
-
 
 	_, err := sendStructuredRequestParseResponse[any](
 		ctx,
@@ -416,8 +291,4 @@ func (t *Trackables) UpdateTrackableById(ctx context.Context, trackableId string
 
 	return err
 
-
-
 }
-
-

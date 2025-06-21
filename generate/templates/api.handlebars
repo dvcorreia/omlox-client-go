@@ -37,10 +37,10 @@ func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}
 
 {{#each bodyParams}}
 {{#with ../returnType}}
-{{~#if ../isListContainer}}
-	return sendStructuredRequestParseResponseList[{{{../baseType}}}](
+{{~#if returnContainer}}
+	return sendStructuredRequestParseResponseList[{{returnBaseType}}](
 {{~else}}
-	return sendStructuredRequestParseResponse[{{{.}}}](
+	return sendStructuredRequestParseResponse[{{returnBaseType}}](
 {{~/if}}
 		ctx,
 		{{lower (substring ../classname 0 1)}}.client,
@@ -75,10 +75,10 @@ func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}
 {{/each}}
 {{#unless bodyParams}}
 {{#with returnType}}
-{{~#if isListContainer}}
-	return sendRequestParseResponseList[{{{baseType}}}](
+{{~#if returnContainer}}
+	return sendRequestParseResponseList[{{returnBaseType}}](
 {{~else}}
-	return sendRequestParseResponse[{{{.}}}](
+	return sendRequestParseResponse[{{returnBaseType}}](
 {{~/if}}
 		ctx,
 		{{lower (substring ../classname 0 1)}}.client,
