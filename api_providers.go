@@ -92,12 +92,15 @@ type ProvidersAPI interface {
 	UpdateSensorsByProviderId(ctx context.Context, providerId string, anyType AnyType) error
 }
 
-// Providers is a simple wrapper around the client for Providers requests
-type Providers struct {
+type providersAPI struct {
 	client *Client
 }
 
-func (p *Providers) CreateLocationProvider(ctx context.Context, locationProvider LocationProvider) (*LocationProvider, error) {
+var _ ProvidersAPI = (*providersAPI)(nil)
+
+// CreateLocationProvider create a location provider.
+// Creates a new location provider and returns the created object.
+func (p *providersAPI) CreateLocationProvider(ctx context.Context, locationProvider LocationProvider) (*LocationProvider, error) {
 	requestPath := "/v1/providers"
 
 	return sendStructuredRequestParseResponse[LocationProvider](
@@ -112,7 +115,9 @@ func (p *Providers) CreateLocationProvider(ctx context.Context, locationProvider
 
 }
 
-func (p *Providers) DeleteLocations(ctx context.Context) error {
+// DeleteLocations deletes the last known location for all location providers.
+// This function deletes all locations for location providers known to the system.
+func (p *providersAPI) DeleteLocations(ctx context.Context) error {
 	requestPath := "/v1/providers/locations"
 
 	_, err := sendRequestParseResponse[any](
@@ -129,7 +134,9 @@ func (p *Providers) DeleteLocations(ctx context.Context) error {
 
 }
 
-func (p *Providers) DeleteProviderById(ctx context.Context, providerId string) error {
+// DeleteProviderById delete location provider.
+// Deletes the location provider object with the given id.
+func (p *providersAPI) DeleteProviderById(ctx context.Context, providerId string) error {
 	requestPath := "/v1/providers/{provider_id}"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -147,7 +154,9 @@ func (p *Providers) DeleteProviderById(ctx context.Context, providerId string) e
 
 }
 
-func (p *Providers) DeleteProviderLocationById(ctx context.Context, providerId string) error {
+// DeleteProviderLocationById delete location of location provider.
+// Deletes the location object of the provider with the given id.
+func (p *providersAPI) DeleteProviderLocationById(ctx context.Context, providerId string) error {
 	requestPath := "/v1/providers/{provider_id}/location"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -165,7 +174,9 @@ func (p *Providers) DeleteProviderLocationById(ctx context.Context, providerId s
 
 }
 
-func (p *Providers) DeleteProviders(ctx context.Context) error {
+// DeleteProviders delete all location providers.
+// This function deletes all location providers known to the system.
+func (p *providersAPI) DeleteProviders(ctx context.Context) error {
 	requestPath := "/v1/providers"
 
 	_, err := sendRequestParseResponse[any](
@@ -182,7 +193,9 @@ func (p *Providers) DeleteProviders(ctx context.Context) error {
 
 }
 
-func (p *Providers) GetAllLocations(ctx context.Context, crs string, zoneId string, geojson string) ([]Location, error) {
+// GetAllLocations get all locations.
+// Returns the last known location for all location providers.
+func (p *providersAPI) GetAllLocations(ctx context.Context, crs string, zoneId string, geojson string) ([]Location, error) {
 	requestPath := "/v1/providers/locations"
 
 	requestQueryParameters := url.Values{}
@@ -202,7 +215,9 @@ func (p *Providers) GetAllLocations(ctx context.Context, crs string, zoneId stri
 
 }
 
-func (p *Providers) GetAllProviderObjects(ctx context.Context) ([]LocationProvider, error) {
+// GetAllProviderObjects get an array of all location providers.
+// Returns an array of all location provider objects.
+func (p *providersAPI) GetAllProviderObjects(ctx context.Context) ([]LocationProvider, error) {
 	requestPath := "/v1/providers/summary"
 
 	return sendRequestParseResponseList[LocationProvider](
@@ -217,7 +232,9 @@ func (p *Providers) GetAllProviderObjects(ctx context.Context) ([]LocationProvid
 
 }
 
-func (p *Providers) GetAllProviderTrackables(ctx context.Context, providerId string) ([]string, error) {
+// GetAllProviderTrackables get all trackables which are linked to this provider.
+// Returns the ids of all trackables which are linked to the location provider with the given id.
+func (p *providersAPI) GetAllProviderTrackables(ctx context.Context, providerId string) ([]string, error) {
 	requestPath := "/v1/providers/{provider_id}/trackables"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -233,7 +250,9 @@ func (p *Providers) GetAllProviderTrackables(ctx context.Context, providerId str
 
 }
 
-func (p *Providers) GetInsideFenceForProvider(ctx context.Context, providerId string, spatialQuery bool) ([]Fence, error) {
+// GetInsideFenceForProvider get all fences the location provider is within.
+// Returns all fences for which the location providers is currently considered as being inside the respective fence, e.g., for which a region entry fence event was triggered.
+func (p *providersAPI) GetInsideFenceForProvider(ctx context.Context, providerId string, spatialQuery bool) ([]Fence, error) {
 	requestPath := "/v1/providers/{provider_id}/fences"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -252,7 +271,9 @@ func (p *Providers) GetInsideFenceForProvider(ctx context.Context, providerId st
 
 }
 
-func (p *Providers) GetLocationByProviderId(ctx context.Context, providerId string, crs string, zoneId string, geojson string) (*Location, error) {
+// GetLocationByProviderId get location.
+// Returns the last known location for a location provider.
+func (p *providersAPI) GetLocationByProviderId(ctx context.Context, providerId string, crs string, zoneId string, geojson string) (*Location, error) {
 	requestPath := "/v1/providers/{provider_id}/location"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -273,7 +294,9 @@ func (p *Providers) GetLocationByProviderId(ctx context.Context, providerId stri
 
 }
 
-func (p *Providers) GetLocationProviderIds(ctx context.Context) ([]string, error) {
+// GetLocationProviderIds get an array of all location provider ids.
+// This function returns an array of ids of all available providers.
+func (p *providersAPI) GetLocationProviderIds(ctx context.Context) ([]string, error) {
 	requestPath := "/v1/providers"
 
 	return sendRequestParseResponseList[string](
@@ -288,7 +311,9 @@ func (p *Providers) GetLocationProviderIds(ctx context.Context) ([]string, error
 
 }
 
-func (p *Providers) GetProviderById(ctx context.Context, providerId string) (*LocationProvider, error) {
+// GetProviderById get a location provider.
+// Returns the location provider object with the given id.
+func (p *providersAPI) GetProviderById(ctx context.Context, providerId string) (*LocationProvider, error) {
 	requestPath := "/v1/providers/{provider_id}"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -304,7 +329,9 @@ func (p *Providers) GetProviderById(ctx context.Context, providerId string) (*Lo
 
 }
 
-func (p *Providers) GetSensorsByProviderId(ctx context.Context, providerId string) (*AnyType, error) {
+// GetSensorsByProviderId get sensor data.
+// Returns the sensor data for the location provider with the given id.
+func (p *providersAPI) GetSensorsByProviderId(ctx context.Context, providerId string) (*AnyType, error) {
 	requestPath := "/v1/providers/{provider_id}/sensors"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -320,7 +347,9 @@ func (p *Providers) GetSensorsByProviderId(ctx context.Context, providerId strin
 
 }
 
-func (p *Providers) UpdateLocationByProviderId(ctx context.Context, providerId string, location Location) error {
+// UpdateLocationByProviderId update location.
+// This method updates the current location of the location provider with the given id.
+func (p *providersAPI) UpdateLocationByProviderId(ctx context.Context, providerId string, location Location) error {
 	requestPath := "/v1/providers/{provider_id}/location"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -338,7 +367,9 @@ func (p *Providers) UpdateLocationByProviderId(ctx context.Context, providerId s
 
 }
 
-func (p *Providers) UpdateLocations(ctx context.Context, location []Location) error {
+// UpdateLocations update locations.
+// This path is used to update multiple locations in a bulk operation.
+func (p *providersAPI) UpdateLocations(ctx context.Context, location []Location) error {
 	requestPath := "/v1/providers/locations"
 
 	_, err := sendStructuredRequestParseResponse[any](
@@ -355,7 +386,9 @@ func (p *Providers) UpdateLocations(ctx context.Context, location []Location) er
 
 }
 
-func (p *Providers) UpdateProviderById(ctx context.Context, providerId string, locationProvider LocationProvider) error {
+// UpdateProviderById update a location provider.
+// Updates the location provider object with the given id.
+func (p *providersAPI) UpdateProviderById(ctx context.Context, providerId string, locationProvider LocationProvider) error {
 	requestPath := "/v1/providers/{provider_id}"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -373,7 +406,9 @@ func (p *Providers) UpdateProviderById(ctx context.Context, providerId string, l
 
 }
 
-func (p *Providers) UpdateProximities(ctx context.Context, proximity []Proximity) error {
+// UpdateProximities bulk update of locations based on proximity events.
+// This method updates locations related to proximity events in a bulk operation. Location objects are generated internally by using the position and floor information related to the omlox™ zone that generated the proximity events.
+func (p *providersAPI) UpdateProximities(ctx context.Context, proximity []Proximity) error {
 	requestPath := "/v1/providers/proximities"
 
 	_, err := sendStructuredRequestParseResponse[any](
@@ -390,7 +425,9 @@ func (p *Providers) UpdateProximities(ctx context.Context, proximity []Proximity
 
 }
 
-func (p *Providers) UpdateProximityByProviderId(ctx context.Context, providerId string, proximity Proximity) error {
+// UpdateProximityByProviderId update location of location provider via a proximity event.
+// This method updates the current location of one location provider by an emitted proximity event. A location object is generated internally by using the position and floor information related to the omlox™ zone that generated the proximity event.
+func (p *providersAPI) UpdateProximityByProviderId(ctx context.Context, providerId string, proximity Proximity) error {
 	requestPath := "/v1/providers/{provider_id}/proximity"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 
@@ -408,7 +445,9 @@ func (p *Providers) UpdateProximityByProviderId(ctx context.Context, providerId 
 
 }
 
-func (p *Providers) UpdateSensorsByProviderId(ctx context.Context, providerId string, anyType AnyType) error {
+// UpdateSensorsByProviderId update sensor data.
+// This method updates the sensor data of the location provider with the given id.
+func (p *providersAPI) UpdateSensorsByProviderId(ctx context.Context, providerId string, anyType AnyType) error {
 	requestPath := "/v1/providers/{provider_id}/sensors"
 	requestPath = strings.Replace(requestPath, "{"+"provider_id"+"}", url.PathEscape(providerId), -1)
 

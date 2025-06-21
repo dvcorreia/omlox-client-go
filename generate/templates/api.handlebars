@@ -20,12 +20,18 @@ type {{cut classname "Api"}}API interface {
 {{/each}}
 }
 
-// {{cut classname "Api"}} is a simple wrapper around the client for {{cut classname "Api"}} requests
-type {{cut classname "Api"}} struct {
+type {{lower (cut classname "Api")}}API struct {
 	client *Client
 }
+
+var _ {{cut classname "Api"}}API = (*{{lower (cut classname "Api")}}API)(nil)
+
 {{#each operation}}
-func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}(ctx context.Context{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}, {{paramName}} {{{dataType}}}{{/endsWith}}{{/each}}{{#each bodyParams}}, {{paramName}} {{{dataType}}}{{/each}}{{#each queryParams}}{{#neq paramName "list"}}, {{paramName}} {{{dataType}}}{{/neq}}{{/each}}) ({{#with returnType}}{{#if returnContainer}}[]{{else}}*{{/if}}{{returnBaseType}}, {{/with}}error) {
+{{#if isDeprecated}}
+// Deprecated{{/if}}
+// {{operationId}}{{#if summary}} {{lower (substring summary 0 1)}}{{substring summary 1}}{{/if}}{{#if notes}}
+// {{{notes}}}{{/if}}
+func ({{lower (substring classname 0 1)}} *{{lower (cut classname "Api")}}API) {{nickname}}(ctx context.Context{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}, {{paramName}} {{{dataType}}}{{/endsWith}}{{/each}}{{#each bodyParams}}, {{paramName}} {{{dataType}}}{{/each}}{{#each queryParams}}{{#neq paramName "list"}}, {{paramName}} {{{dataType}}}{{/neq}}{{/each}}) ({{#with returnType}}{{#if returnContainer}}[]{{else}}*{{/if}}{{returnBaseType}}, {{/with}}error) {
 	requestPath := "/v1{{{path}}}"{{#each pathParams}}{{#endsWith baseName "_mount_path"}}
 	requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape(requestModifiers.mountPathOr({{#with defaultValue}}{{{.}}}{{/with}})), -1){{/endsWith}}{{/each}}{{#each pathParams}}{{#endsWith baseName "_mount_path"}}{{else}}
 	requestPath = strings.Replace(requestPath, "{"+"{{baseName}}"+"}", url.PathEscape({{paramName}}), -1){{/endsWith}}{{/each}}

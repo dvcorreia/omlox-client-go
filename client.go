@@ -91,19 +91,19 @@ func newClient(addr string, configuration ClientConfiguration) (*Client, error) 
 		subs: make(map[int]*Subcription),
 	}
 
-	c.TrackablesAPI = &Trackables{
+	c.TrackablesAPI = &trackablesAPI{
 		client: &c,
 	}
 
-	c.ProvidersAPI = &Providers{
+	c.ProvidersAPI = &providersAPI{
 		client: &c,
 	}
 
-	c.FencesAPI = &Fences{
+	c.FencesAPI = &fencesAPI{
 		client: &c,
 	}
 
-	c.ZonesAPI = &Zones{
+	c.ZonesAPI = &zonesAPI{
 		client: &c,
 	}
 
