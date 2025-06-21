@@ -47,7 +47,7 @@ func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}
 		{{lower (substring ../classname 0 1)}}.client,
 		http.Method{{../httpMethod}},
 		requestPath,
-		{{../paramName}},
+		{{#if ../paramName}}{{../paramName}}{{else}}nil{{/if}},
 {{#if ../queryParams.length}}
 		requestQueryParameters,
 {{else}}
@@ -62,7 +62,7 @@ func ({{lower (substring classname 0 1)}} *{{cut classname "Api"}}) {{nickname}}
 		{{lower (substring ../classname 0 1)}}.client,
 		http.Method{{../httpMethod}},
 		requestPath,
-		{{../paramName}},
+		{{#if ../paramName}}{{../paramName}}{{else}}nil{{/if}},
 {{#if ../queryParams.length}}
 		requestQueryParameters,
 {{else}}

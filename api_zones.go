@@ -293,7 +293,7 @@ func (z *Zones) UpdateZoneById(ctx context.Context, zoneId string, zone Zone) (e
 		z.client,
 		http.MethodPut,
 		requestPath,
-		,
+		nil,
 
 		nil,
 

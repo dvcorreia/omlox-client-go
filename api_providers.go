@@ -467,7 +467,7 @@ func (p *Providers) UpdateLocationByProviderId(ctx context.Context, providerId s
 		p.client,
 		http.MethodPut,
 		requestPath,
-		,
+		nil,
 
 		nil,
 
@@ -496,7 +496,7 @@ func (p *Providers) UpdateLocations(ctx context.Context, location []Location) (e
 		p.client,
 		http.MethodPut,
 		requestPath,
-		,
+		nil,
 
 		nil,
 
@@ -526,7 +526,7 @@ func (p *Providers) UpdateProviderById(ctx context.Context, providerId string, l
 		p.client,
 		http.MethodPut,
 		requestPath,
-		,
+		nil,
 
 		nil,
 
@@ -555,7 +555,7 @@ func (p *Providers) UpdateProximities(ctx context.Context, proximity []Proximity
 		p.client,
 		http.MethodPut,
 		requestPath,
-		,
+		nil,
 
 		nil,
 
@@ -585,7 +585,7 @@ func (p *Providers) UpdateProximityByProviderId(ctx context.Context, providerId 
 		p.client,
 		http.MethodPut,
 		requestPath,
-		,
+		nil,
 
 		nil,
 
@@ -615,7 +615,7 @@ func (p *Providers) UpdateSensorsByProviderId(ctx context.Context, providerId st
 		p.client,
 		http.MethodPut,
 		requestPath,
-		,
+		nil,
 
 		nil,
 

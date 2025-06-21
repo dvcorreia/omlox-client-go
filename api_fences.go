@@ -423,7 +423,7 @@ func (f *Fences) UpdateFenceById(ctx context.Context, fenceId string, fence Fenc
 		f.client,
 		http.MethodPut,
 		requestPath,
-		,
+		nil,
 
 		nil,
 

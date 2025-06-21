@@ -500,7 +500,7 @@ func (t *Trackables) UpdateTrackableById(ctx context.Context, trackableId string
 		t.client,
 		http.MethodPut,
 		requestPath,
-		,
+		nil,
 
 		nil,
 
